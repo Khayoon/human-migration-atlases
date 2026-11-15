@@ -1,0 +1,4 @@
+Human Migration Atlases — third-party notices
+
+MapLibre GL JS: see THIRD_PARTY_NOTICES/MapLibre-GL-JS-LICENSE.txt.
+Basemap, terrain and river data attribution is displayed in each map.

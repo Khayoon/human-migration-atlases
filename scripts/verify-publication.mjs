@@ -1,0 +1,13 @@
+import { readFile, readdir, stat } from 'node:fs/promises';
+import { resolve, join, dirname, relative } from 'node:path';
+import { createHash } from 'node:crypto';
+const root=resolve('.'),site=join(root,'site');
+const editions=['arab','slavs','turks','germanics','indoeuropeans','roma','seapeoples'];
+async function files(dir){const out=[];for(const e of await readdir(dir,{withFileTypes:true})){const p=join(dir,e.name);if(e.isSymbolicLink())throw Error('Symlink in public site: '+relative(root,p));if(e.isDirectory())out.push(...await files(p));else if(e.isFile())out.push(p);}return out;}
+for(const id of editions){await stat(join(site,'atlas',id,'index.html'));await stat(join(root,'docs','atlases',id,'SOURCES_AND_METHODOLOGY.md'));}
+const forbiddenKeys=new Set(['agentPreparation','suppliedText','sourceText','rawText','originalWording','sourceDocument','sourceFile']);
+function inspect(v,path){if(!v||typeof v!=='object')return;for(const [k,x]of Object.entries(v)){if(forbiddenKeys.has(k))throw Error('Private source field: '+path+'.'+k);if((k==='raw'||k==='original')&&x&&typeof x==='object'&&Object.keys(x).length)throw Error('Nonempty original payload: '+path+'.'+k);inspect(x,path+'.'+k);}}
+let json=0,maximum=0;const deployed=await files(site);
+for(const p of deployed){const name=relative(site,p).replaceAll('\\','/'),size=(await stat(p)).size;maximum=Math.max(maximum,size);if(size>25000000)throw Error('Deployment file exceeds25MB: '+name);if(/(?:\.source\.txt|\.register\.json|\.extracted\.json|\.review(?:\.json)?|\.report\.json|\.docx|\.pdf|\.map)$/i.test(name))throw Error('Private input in public site: '+name);if(!p.endsWith('.json'))continue;let v=JSON.parse(await readFile(p,'utf8'));if(v.$atlas==='json-byte-parts-v1'){const parts=[];for(const part of v.parts){if(part.includes('/')||part.includes('\\')||part==='..')throw Error('Unsafe JSON part path');parts.push(await readFile(join(dirname(p),part)));}const b=Buffer.concat(parts);if(b.length!==v.byteLength)throw Error('JSON byte length mismatch');v=JSON.parse(b.toString('utf8'));}inspect(v,name);json++;}
+const publication=JSON.parse(await readFile(join(root,'PUBLICATION.json'),'utf8'));for(const [name,want]of Object.entries(publication.files)){const path=resolve(root,name);if(relative(root,path).startsWith('..'))throw Error('Unsafe publication path');const actual=createHash('sha256').update(await readFile(path)).digest('hex');if(actual!==want)throw Error('Publication hash mismatch: '+name);}
+console.log(JSON.stringify({editions:editions.length,siteFiles:deployed.length,decodedJson:json,maximumFileBytes:maximum,verifiedHashes:Object.keys(publication.files).length}));

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="atlas-project" content="slavs" />
+    <meta name="atlas-root" content="../" />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Explore population movements, settlements and demographic change across geography and time with your own migration datasets." />
+    <title>Slavic Migration Atlas</title>
+    <script type="module" crossorigin src="../assets/main-RXs8eTpe.js"></script>
+    <link rel="stylesheet" crossorigin href="../assets/main-gQc1_SC0.css">
+  <style id="publication-nav-style">#publication-nav{position:relative;color:#594f3f;font:12px system-ui,sans-serif}#publication-nav summary{cursor:pointer;list-style:none;border:1px solid #cfc7b7;border-radius:5px;padding:6px 9px;background:#faf8f1;white-space:nowrap}#publication-nav summary::-webkit-details-marker{display:none}#publication-nav nav{position:absolute;right:0;top:calc(100% + 6px);width:240px;max-height:75vh;overflow:auto;background:#fffdf7;border:1px solid #cfc7b7;border-radius:7px;padding:6px;box-shadow:0 5px 22px #0002;z-index:2000}#publication-nav a{display:block;padding:9px 10px;color:#514737;text-decoration:none;border-radius:4px}#publication-nav a:hover{background:#eee9db}#publication-nav a[aria-current=page]{font-weight:700;background:#f0eadc}#publication-nav #publication-methodology{border-top:1px solid #e2dbcc;margin-top:5px;border-radius:0;font-weight:600}@media(max-width:760px){#publication-nav summary{font-size:0;width:30px;height:30px;padding:0;display:grid;place-items:center}#publication-nav summary::after{content:'↗';font-size:16px}#publication-nav nav{position:fixed;right:8px;top:48px;max-width:calc(100vw - 16px)}}</style></head>
+  <body>
+    <div id="app">
+      <div id="map"></div>
+      <canvas id="overlay" aria-label="Migration routes and population distributions"></canvas>
+      <header id="topbar">
+        <button id="panel-toggle" class="icon-btn" title="Toggle panel (P)" aria-label="Toggle panel" aria-controls="panel">☰</button>
+        <div id="dataset-title">Migration Atlas</div>
+        <div id="workspace-switch" class="hidden" role="group" aria-label="Workspace view">
+          <button id="btn-map-view" aria-pressed="true">Map</button>
+          <button id="btn-research-view" aria-pressed="false">Sources</button>
+        </div>
+        <div id="topbar-right"><details id="publication-nav"><summary aria-label="Choose atlas and sources">Atlases &amp; sources ▾</summary><nav aria-label="Migration atlases"><a href="../arab/">Arab migrations</a><a href="../slavs/" aria-current="page">Slavic dispersals</a><a href="../turks/">Turkic migrations</a><a href="../germanics/">Germanic migrations</a><a href="../indoeuropeans/">Indo-European dispersals</a><a href="../roma/">Roma migrations</a><a href="../seapeoples/">Sea Peoples</a><a id="publication-methodology" href="https://github.com/Khayoon/human-migration-atlases/blob/main/docs/atlases/slavs/SOURCES_AND_METHODOLOGY.md" target="_blank" rel="noopener noreferrer">Sources &amp; methodology ↗</a></nav></details>
+          
+          
+          
+          
+          
+          
+          <button id="btn-global-view" class="icon-btn" title="Global overview" aria-label="Global overview">◎</button>
+          <button id="btn-reset-view" class="icon-btn" title="Reset map overview" aria-label="Reset map overview">⌂</button>
+          <button id="btn-help" class="icon-btn" title="Keyboard shortcuts">?</button>
+        </div>
+      </header>
+      <section id="research-workspace" class="hidden" aria-label="Research workspace"></section>
+      <section id="evidence-map" class="hidden" aria-label="Explore mapped records"></section>
+      <section id="map-research-note" class="hidden" aria-label="Map preparation status">
+        <p>This dataset has no prepared geographic features.</p>
+        <button id="btn-review-research" class="btn">View source records</button>
+      </section>
+      <aside id="panel">
+        <nav id="panel-tabs">
+          <button data-tab="populations" class="active">Populations</button>
+          <button data-tab="layers">Layers</button>
+          <button data-tab="data">Data</button>
+        </nav>
+        <section id="tab-populations" class="tab active"></section>
+        <section id="tab-layers" class="tab"></section>
+        <section id="tab-data" class="tab"></section>
+      </aside>
+      <div id="inspector" class="hidden"></div>
+      <div id="legend" class="hidden"></div>
+      <footer id="timeline">
+        <div id="tl-controls"></div>
+        <canvas id="tl-canvas"></canvas>
+      </footer>
+      <div id="toast" role="status" aria-live="polite"></div>
+      <div id="help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Keyboard and mouse help"></div>
+    </div>
+  </body>
+</html>
