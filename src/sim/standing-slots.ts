@@ -65,9 +65,11 @@ export function buildStandingSlots(dataset:Dataset,unit:number,mode:'mid'|'low'|
     }
     if(needed>.01)throw new Error(`${s.id}: stable slots cannot fund ${e.migrationId} at ${e.year}`);
    }else{
+    if(e.descendantSupport&&!origins.size)throw new Error(`${s.id}: descendant support ${e.migrationId} requires a surviving resident lineage at ${e.year}`);
+    const inherited=e.descendantSupport?growthDispersionFrom(origins):undefined;
     let id=0;while(slots.has(id))id++;link.toSlot=id;
     next=addPeople(slots,e.delta,unit,next,changes,true,slot=>{
-     const origin:StandingSlotOrigin={year:e.year,kind:e.kind==='addition'?'initial':'arrival'};
+     const origin:StandingSlotOrigin={year:e.year,kind:e.descendantSupport?'growth':e.kind==='addition'?'initial':'arrival',...(inherited!==undefined?{dispersionFrom:inherited}:{})};
      origins.set(slot,origin);originChanges.set(slot,origin);
     });
    }

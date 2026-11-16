@@ -122,11 +122,12 @@ export function growPopulation(value:number, years:number, rate:number, capacity
   if(value>=capacity)return value;
   return capacity/(1+(capacity/value-1)*Math.exp(-rate*years));
 }
-export interface LedgerEvent { year:number; delta:number; migrationId:string; index:number; kind?:'loss'|'addition' }
+export interface LedgerEvent { year:number; delta:number; migrationId:string; index:number; kind?:'loss'|'addition'; descendantSupport?:true }
 function adjustmentEvents(adjustment:PopulationLoss,unit:number,mode:'mid'|'low'|'high',kind:'loss'|'addition'):LedgerEvent[]{
   const total=mode==='mid'?adjustment.central:adjustment[mode],n=Math.ceil(total/unit),sign=kind==='loss'?-1:1;
   return Array.from({length:n},(_,i)=>({year:adjustment.start+(adjustment.end-adjustment.start)*(i+.5)/n,
-    delta:sign*Math.min(unit,total-i*unit),migrationId:`${kind}:${adjustment.id}`,index:i,kind}));
+    delta:sign*Math.min(unit,total-i*unit),migrationId:`${kind}:${adjustment.id}`,index:i,kind,
+    ...(kind==='addition'&&'descendantSupport' in adjustment&&adjustment.descendantSupport===true?{descendantSupport:true as const}:{})}));
 }
 export function ledgerEvents(dataset:Dataset,unit:number,mode:'mid'|'low'|'high'='mid',losses=dataset.meta.ledger?.losses??[],additions=dataset.meta.ledger?.additions??[]):Map<string,LedgerEvent[]> {
   const out=new Map(dataset.settlements.filter(s=>s.ledger).map(s=>[s.id,[] as LedgerEvent[]]));
@@ -136,7 +137,11 @@ export function ledgerEvents(dataset:Dataset,unit:number,mode:'mid'|'low'|'high'
   }
   for(const [adjustments,kind] of [[losses,'loss'],[additions,'addition']] as const)for(const adjustment of adjustments)
     out.get(adjustment.settlementId)?.push(...adjustmentEvents(adjustment,unit,mode,kind));
-  for(const list of out.values())list.sort((a,b)=>a.year-b.year||b.delta-a.delta||a.migrationId.localeCompare(b.migrationId));
+  for(const list of out.values())list.sort((a,b)=>a.year-b.year
+    // A same-year incoming survivor can seed descendants, even when its credit
+    // is smaller. Keep all legacy event ties unchanged without this opt-in.
+    ||((a.descendantSupport||b.descendantSupport)?(a.delta<0?2:a.descendantSupport?1:0)-(b.delta<0?2:b.descendantSupport?1:0):0)
+    ||b.delta-a.delta||a.migrationId.localeCompare(b.migrationId));
   return out;
 }
 export function ledgerBalance(s:Settlement,events:LedgerEvent[],year:number,rate=s.ledger!.annualRate):number {
@@ -200,6 +205,8 @@ export function applyPopulationLedger(dataset:Dataset,bindings:Map<string,AtlasP
   const scales=prep.scenarioReservoirScales??{low:.2,high:4};
   const fixedRate=prep.fixedAnnualRate;
   const losses=prep.losses??[],additions=prep.additions??[],adjustmentIds=new Set<string>();
+  for(const addition of additions)if(addition.descendantSupport!==undefined&&addition.descendantSupport!==true)
+    throw new Error(`${addition.id}: descendantSupport must be true when provided.`);
   for(const adjustment of [...losses,...additions]){
     if(!adjustment.id||adjustmentIds.has(adjustment.id))throw new Error('Population adjustments require unique nonempty IDs.');
     adjustmentIds.add(adjustment.id);
@@ -352,7 +359,7 @@ export function applyPopulationLedger(dataset:Dataset,bindings:Map<string,AtlasP
   let failure='';
   const viable=(rate:number)=>dataset.settlements.every(s=>{
     let v=mode==='low'?s.ledger!.initialLow??s.ledger!.initial*scale:mode==='high'?s.ledger!.initialHigh??s.ledger!.initial*scale:s.ledger!.initial,t=s.start;
-    for(const e of events.get(s.id)??[]){if(e.year<s.start){failure=`${mode}: ${s.id} transfer predates reservoir start`;return false;}v=growPopulation(v,e.year-t,s.ledger!.closedCohort?0:rate,s.ledger!.capacity*scale)+e.delta;t=e.year;if(v<-.01){failure=`${mode}: ${s.id} at ${t}: ${Math.round(v)} people after ${e.migrationId}`;return false;}}
+    for(const e of events.get(s.id)??[]){if(e.year<s.start){failure=`${mode}: ${s.id} transfer predates reservoir start`;return false;}v=growPopulation(v,e.year-t,s.ledger!.closedCohort?0:rate,s.ledger!.capacity*scale);if(e.descendantSupport&&v<=1e-6){failure=`${mode}: ${s.id} descendant support ${e.migrationId} requires a surviving resident lineage at ${e.year}`;return false;}v+=e.delta;t=e.year;if(v<-.01){failure=`${mode}: ${s.id} at ${t}: ${Math.round(v)} people after ${e.migrationId}`;return false;}}
     return true;
   });
   if(fixedRate!==undefined){if(!viable(fixedRate))throw new Error(`Standing-population ledger cannot fund its departures at the declared annual rate: ${failure}`);return fixedRate;}
@@ -385,7 +392,7 @@ export function auditPopulationLedger(dataset:Dataset):void {
   for(const s of dataset.settlements){
     if(!s.ledger)throw new Error(`${s.id}: settlement bypasses ledger`);
     let v=s.ledger.initial,t=s.start;
-    for(const e of events.get(s.id)??[]){if(e.year<s.start)throw new Error(`${s.id}: transfer predates reservoir start`);v=growPopulation(v,e.year-t,s.ledger.annualRate,s.ledger.capacity)+e.delta;t=e.year;if(v<-.01)throw new Error(`${s.id}: negative standing population at ${t}`);}
+    for(const e of events.get(s.id)??[]){if(e.year<s.start)throw new Error(`${s.id}: transfer predates reservoir start`);v=growPopulation(v,e.year-t,s.ledger.annualRate,s.ledger.capacity);if(e.descendantSupport&&v<=1e-6)throw new Error(`${s.id}: descendant support ${e.migrationId} requires a surviving resident lineage at ${e.year}`);v+=e.delta;t=e.year;if(v<-.01)throw new Error(`${s.id}: negative standing population at ${t}`);}
     if(Math.expm1(s.ledger.annualRate)>max)throw new Error(`${s.id}: unmatched annual natural growth exceeds ${max*100}%`);
   }
 }

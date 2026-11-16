@@ -11,7 +11,7 @@ import './register-tests.mjs';
 const { compileDataset } = await import('../src/data/loader.ts');
 const { readEstimateInput } = await import('../src/data/estimate-input.ts');
 const { compileAtlasPopulation } = await import('../src/data/atlas-model.ts');
-const { attachLedger } = await import('../src/data/population-ledger.ts');
+const { attachLedger, transferEvents } = await import('../src/data/population-ledger.ts');
 const { advanceNarrativePlayback } = await import('../src/time/clock.ts');
 const { phasePlaybackDuration, phaseRateAt } = await import('../src/time/phase-pacing.ts');
 
@@ -47,12 +47,20 @@ const stamp = new Date().toISOString().replaceAll(/[-:]/g, '').replace(/\.\d+Z$/
 const directory = join(process.cwd(), 'outputs');
 const inspection = join(process.cwd(), '.atlas-runtime', `roma-video-${stamp}`);
 await mkdir(directory, { recursive: true }); await mkdir(inspection, { recursive: true });
-const stem = `Roma-Migrations-Dispersed-Smooth-200-2025-${stamp}`;
+const stem = `Roma-Migrations-Continuous-Journeys-200-2025-${stamp}`;
 const viewing = join(directory, `${stem}.mp4`);
 const partial = join(directory, `${stem}.partial.mp4`);
 const metadataPath = join(directory, `${stem}.json`);
 const loadedSourceFingerprints = {};
 const cameraTrace = [];
+const travelDurations = dataset.migrations.map(migration => {
+  const events = transferEvents(migration, 1000);
+  const durations = events.map(event => phasePlaybackDuration(dataset, [event.departure, event.arrival], speed));
+  return {id:migration.id,from:migration.fromSettlement,to:migration.toSettlement,
+    start:migration.start,end:migration.end,travelYears:migration.travelYears,
+    minimumSeconds:Math.min(...durations),maximumSeconds:Math.max(...durations),
+    minimumFrames:Math.min(...durations)*fps,maximumFrames:Math.max(...durations)*fps};
+});
 const ffmpeg = process.env.FFMPEG_PATH ?? 'C:/FFmpeg/bin/ffmpeg.exe';
 const ffprobe = process.env.FFPROBE_PATH ?? 'C:/FFmpeg/bin/ffprobe.exe';
 let puppeteer;
@@ -60,9 +68,11 @@ try { puppeteer = (await import('puppeteer')).default; }
 catch { puppeteer = (await import(pathToFileURL(join(homedir(), 'node_modules/puppeteer/lib/esm/puppeteer/puppeteer.js')).href)).default; }
 
 const hook = `
+window.__romaBasemapErrors=[];map.on('error',event=>window.__romaBasemapErrors.push(event.error?.message??String(event.error)));
 window.__romaVideo = {
  ready:()=>!!journeyPackage && !!atlasProjection && styleReady && store.state.dataset.migrations.length===${expectedMigrations},
  setup:()=>{
+  if(!window.__romaCaptureDraw){const draw=overlay.draw.bind(overlay);overlay.draw=(frame,state)=>{window.__romaLastFrame=frame;return draw(frame,state);};window.__romaCaptureDraw=true;}
   clock.stop();store.patch({playing:false,panelOpen:false,selected:null,hovered:null,estimateMode:'mid',ppdMultiplier:1,lod:false,dotScale:${raw.meta.defaultDotScale ?? 1.8}});
   automaticEarlyOverview=null;automaticPreparedOverview=true;preparedCameraKey='';
   evidenceMap.setTimelineEnabled(true);map.stop();map.resize();overlay.resize();
@@ -112,7 +122,15 @@ window.__romaVideo = {
   const model=evidenceMap.getColorLegendModel();
   let cueTop=1080-34-(48+Math.ceil((model.entries??[]).length/2)*21+(model.preIslamic?25:0))-46;
   for(const cue of continuationCueLayer.state().filter(item=>item.visible)){const node=document.querySelector('[data-continuation-id="'+cue.id+'"]');if(node){node.style.left='24px';node.style.top=cueTop+'px';node.style.width='340px';}cueTop-=46;}
-  return {year:store.state.t,dots:overlay.lastDotCount,zoom:map.getZoom(),center:map.getCenter().toArray(),bounds:map.getBounds().toArray(),cameraPath:mapEl.dataset.cameraPath,cameraRegion:mapEl.dataset.cameraRegion,geographicClip:overlay.canvas.dataset.geographicClip,cues:continuationCueLayer.state(),legend:model.entries.map(item=>({id:item.id,label:item.label,color:item.color}))};
+  const earlyTravel=[];
+  if(year<=1100){const view=overlay.view();for(const item of window.__romaLastFrame?.migrations??[]){
+   const dots=item.dots;if(!dots.count)continue;
+   const moving=[];for(let index=0;index<dots.count;index++){if(dots.states?.[index]!==1)continue;const x=dots.xs[index],y=dots.ys[index];moving.push({slot:dots.slots?.[index],progress:dots.progress?.[index],x,y,visible:x>=view.minX&&x<=view.maxX&&y>=view.minY&&y<=view.maxY});}
+   if(moving.length)earlyTravel.push({id:item.m.id,moving});
+  }}
+  const basemap={waterFeatures:map.querySourceFeatures('omt',{sourceLayer:'water'}).length,landcoverFeatures:map.querySourceFeatures('omt',{sourceLayer:'landcover'}).length,errors:window.__romaBasemapErrors};
+  if(!basemap.waterFeatures&&!basemap.landcoverFeatures)throw new Error('Physical basemap tiles are missing at '+year+': '+JSON.stringify(basemap.errors));
+  return {year:store.state.t,dots:overlay.lastDotCount,zoom:map.getZoom(),center:map.getCenter().toArray(),bounds:map.getBounds().toArray(),cameraPath:mapEl.dataset.cameraPath,cameraRegion:mapEl.dataset.cameraRegion,geographicClip:overlay.canvas.dataset.geographicClip,cues:continuationCueLayer.state(),legend:model.entries.map(item=>({id:item.id,label:item.label,color:item.color})),earlyTravel,basemap};
  }
 };`;
 const server = await createServer({ configFile: false, root: process.cwd(),
@@ -136,7 +154,7 @@ const browser = await puppeteer.launch({ headless: true, protocolTimeout: 180000
   args: ['--no-sandbox','--disable-dev-shm-usage','--enable-webgl','--ignore-gpu-blocklist','--enable-unsafe-swiftshader'],
   defaultViewport: { width, height, deviceScaleFactor: 1 } });
 let encoder;
-const errors = [], checks = [];
+const errors = [], checks = [], networkFailures=[];
 const command = async args => {
   const child = spawn(args[0], args.slice(1), { windowsHide: true, stdio: ['ignore','pipe','pipe'] });
   let stdout = '', stderr = ''; child.stdout.on('data', data => stdout += data); child.stderr.on('data', data => stderr += data);
@@ -162,6 +180,8 @@ const cameraMotionSummary=trace=>{
 try {
   const page = await browser.newPage();
   page.on('pageerror', error => errors.push(error.message));
+  page.on('requestfailed', request => networkFailures.push({url:request.url(),error:request.failure()?.errorText}));
+  page.on('response', response => {if(response.status()>=400)networkFailures.push({url:response.url(),status:response.status()});});
   await page.goto(new URL('roma/', base).href, { waitUntil: 'networkidle2', timeout: 120000 });
   await page.waitForFunction(() => window.__romaVideo?.ready(), { timeout: 120000 });
   await page.addStyleTag({ content: `
@@ -185,13 +205,14 @@ try {
   if(raw.meta.dotStyle&&(meta.dotStyle?.outlineColor!=='#000000'||meta.dotStyle?.minimumRadius<3.6))throw new Error('Roma enlarged black outlined dots are not active');
   console.log(JSON.stringify({ phase: 'prepared', ...meta, phases, originalSeconds, viewingSeconds: seconds, timeScale, fps, viewing }));
   // Inspect geographical and historical milestones before committing a full render.
-  for (const year of [200,675,1100,1538,1943.95,2025]) {
+  for (const year of [200,260,330,420,500,600,675,800,950,1100,1538,1943.95,2025]) {
     const status = await page.evaluate((year) => window.__romaVideo.frame(year, 0), year);
     checks.push(status); await page.screenshot({ path: join(inspection, `preview-${String(year).replace('.', '-')}.png`) });
     const composed=await page.evaluate(()=>window.__romaVideo.compose().toDataURL('image/png').split(',')[1]);
     await writeFile(join(inspection,`composed-${String(year).replace('.', '-')}.png`),Buffer.from(composed,'base64'));
   }
-  await writeFile(join(inspection,'preflight.json'),JSON.stringify({meta,checks,errors},null,2));
+  await writeFile(join(inspection,'preflight.json'),JSON.stringify({meta,checks,errors,networkFailures},null,2));
+  if(!checks.find(check=>check.year===1100)?.basemap.waterFeatures)throw new Error('The Europe/Middle East basemap is missing its physical water geometry: '+JSON.stringify({networkFailures,basemap:checks.find(check=>check.year===1100)?.basemap}));
   if(raw.meta.cameraPath?.length&&checks.some(check=>check.cameraPath!=='narrative'))throw new Error('The prepared smooth camera path is not active in the export');
   if(raw.meta.cameraRegions?.length){
     const late=checks.filter(check=>check.year>=1100),reference=late[0];
@@ -219,7 +240,7 @@ try {
     for (let offset=0;offset<total;offset+=24) {
       const frames=Array.from({length:Math.min(24,total-offset)},(_,index)=>{const frame=offset+index,elapsed=Math.min(renderSeconds,frame/fps);return {frame,elapsed,year:frame===total-1?range[1]:yearAt(Math.min(seconds,elapsed))};});
       const batch=await page.evaluate(async ({frames,fps})=>{
-        let status;const motion=[];for(const item of frames){status=await window.__romaVideo.frame(item.year,item.elapsed);motion.push({...item,zoom:status.zoom,center:status.center,dots:status.dots});const canvas=window.__romaVideo.compose();const frame=new VideoFrame(canvas,{timestamp:Math.round(item.frame*1000000/fps),duration:Math.round(1000000/fps)});window.__romaEncoder.encode(frame,{keyFrame:item.frame%(fps*5)===0});frame.close();if(window.__romaEncoder.encodeQueueSize>6)await window.__romaEncoder.flush();}
+        let status;const motion=[];for(const item of frames){status=await window.__romaVideo.frame(item.year,item.elapsed);motion.push({...item,zoom:status.zoom,center:status.center,dots:status.dots,earlyTravel:status.earlyTravel});const canvas=window.__romaVideo.compose();const frame=new VideoFrame(canvas,{timestamp:Math.round(item.frame*1000000/fps),duration:Math.round(1000000/fps)});window.__romaEncoder.encode(frame,{keyFrame:item.frame%(fps*5)===0});frame.close();if(window.__romaEncoder.encodeQueueSize>6)await window.__romaEncoder.flush();}
         await window.__romaEncoder.flush();if(window.__romaEncoderError)throw new Error(window.__romaEncoderError);
         const size=window.__romaChunks.reduce((sum,chunk)=>sum+chunk.length,0),bytes=new Uint8Array(size);let cursor=0;for(const chunk of window.__romaChunks){bytes.set(chunk,cursor);cursor+=chunk.length;}window.__romaChunks=[];
         let binary='';for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));return {data:btoa(binary),status,motion};
@@ -253,10 +274,26 @@ try {
         if(video.currentTime<=0)throw new Error('Video playback did not advance');return {url,duration:video.duration,samples,playbackAdvanced:video.currentTime};
       },url));
     }
-    for (const [label,time] of [['opening',0],['opening-2s',2],['opening-5s',5],['opening-10s',10],['opening-20s',20],['opening-30s',30],['middle',seconds/2],['ending',renderSeconds-.1]])
+    for (const [label,time] of [['opening',0],['opening-2s',2],['opening-5s',5],['opening-10s',10],['opening-15s',15],['opening-20s',20],['opening-25s',25],['opening-30s',30],['middle',seconds/2],['ending',renderSeconds-.1]])
       await command([ffmpeg,'-n','-hide_banner','-loglevel','error','-ss',String(time),'-i',viewing,'-frames:v','1',join(inspection,`${label}.png`)]);
     const cameraMotion=cameraMotionSummary(cameraTrace);
     await writeFile(join(inspection,'camera-motion.json'),JSON.stringify({fps,summary:cameraMotion,frames:cameraTrace},null,2));
+    const routeFrames=new Map();
+    for(const frame of cameraTrace)for(const route of frame.earlyTravel??[]){
+      const row=routeFrames.get(route.id)??{id:route.id,frames:0,visibleFrames:0,visibleDotFrames:0,slots:new Map()};
+      row.frames++;if(route.moving.some(dot=>dot.visible))row.visibleFrames++;
+      for(const dot of route.moving){if(dot.visible)row.visibleDotFrames++;const slot=row.slots.get(dot.slot)??{slot:dot.slot,frames:0,visibleFrames:0,minProgress:1,maxProgress:0};slot.frames++;if(dot.visible)slot.visibleFrames++;slot.minProgress=Math.min(slot.minProgress,dot.progress??0);slot.maxProgress=Math.max(slot.maxProgress,dot.progress??0);row.slots.set(dot.slot,slot);}routeFrames.set(route.id,row);
+    }
+    const earlyRouteMotion=[...routeFrames.values()].map(row=>({...row,seconds:row.frames/fps,visibleSeconds:row.visibleFrames/fps,slots:[...row.slots.values()]}));
+    await writeFile(join(inspection,'journey-motion.json'),JSON.stringify({fps,travelDurations,earlyRouteMotion},null,2));
+    const earlyJourneys=travelDurations.filter(route=>route.start>=range[0]&&route.end<=1100);
+    const earlyMotionFailures=[];
+    for(const journey of earlyJourneys){
+      const sampled=earlyRouteMotion.find(route=>route.id===journey.id),leading=sampled?.slots.find(slot=>slot.slot===0);
+      if(journey.minimumSeconds<1.5||!leading||leading.frames<24||leading.minProgress>.08||leading.maxProgress<.92||leading.visibleFrames/leading.frames<.98)
+        earlyMotionFailures.push({journey,sampled});
+    }
+    if(earlyMotionFailures.length)throw new Error('Early journeys must visibly traverse their complete corridors over multiple frames: '+JSON.stringify(earlyMotionFailures));
     if(raw.meta.cameraPath){
       const step=24/fps;
       if(cameraMotion.maxPanPixelsPerFrame>=8*step||cameraMotion.maxZoomPerFrame>=.012*step||cameraMotion.maxPanAccelerationPixelsPerFrameSquared>=.15*step*step||cameraMotion.zoomInFrames||cameraMotion.horizontalReversals)throw new Error('The rendered camera did not meet the smooth continuous opening requirements: '+JSON.stringify(cameraMotion));
@@ -269,8 +306,9 @@ try {
       if(createHash('sha256').update(await readFile(path)).digest('hex')!==loadedHash)loadedSourceChangedDuringExport.push(path);
     }
     await writeFile(metadataPath,JSON.stringify({schemaVersion:1,edition:'roma',title:meta.title,manifest,range,speed,phases,phaseRates:phases.map(p=>({from:p.from,to:p.to,rate:phaseRateAt(p.from,phases)})),peoplePerDot:1000,dotScale:expectedDotScale,dotStyle:meta.dotStyle,cameraPath:raw.meta.cameraPath,cameraRegions:raw.meta.cameraRegions,continuationCues:raw.meta.continuationCues,estimate:'central',resolution:[width,height],fps,frames:total,originalSeconds,timelineSeconds:seconds,endHoldSeconds,durationSeconds:total/fps,timeScale,
-      temporalSampling:'The complete video follows the corrected app clock at the configured frame rate; app and video use identical default pacing.',
+      temporalSampling:'The complete video follows the corrected app clock at the configured frame rate; app and video use identical default pacing. Early journey motion is recorded at every actual encoded frame.',travelDurations,earlyRouteMotion,
       sourceFingerprints:fingerprints,loadedSourceFingerprints,loadedSourceDirectory:join(inspection,'loaded-source'),changedDuringExport,loadedSourceChangedDuringExport,cameraMotion,inspection,checks,videos,playbackChecks,errors},null,2)+'\n');
+    if(changedDuringExport.length||loadedSourceChangedDuringExport.length)throw new Error('Prepared Roma inputs changed during capture: '+JSON.stringify({changedDuringExport,loadedSourceChangedDuringExport,metadataPath}));
     console.log(JSON.stringify({phase:'complete',viewing,metadataPath,inspection,changedDuringExport,loadedSourceChangedDuringExport,cameraMotion}));
   }
 } finally {

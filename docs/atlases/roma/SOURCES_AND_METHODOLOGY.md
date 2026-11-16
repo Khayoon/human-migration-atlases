@@ -1,30 +1,26 @@
 # Roma migrations, 200–2025 CE: sources and methodology
 
-> **Continuity correction pending — 16 November 2026.** The current published Roma snapshot has a reported animation/model timing issue: Syria and Iraq can appear populated before the arriving groups reach them. The origin-to-Iran-to-Anatolia and southward-branch continuity is being corrected. This document describes the previous published snapshot; the replacement model and documentation are pending verification.
-
 This is an animated reconstruction of movements and selected resident populations associated with the European Romani diaspora, with separately identified Dom, Lom and Iraqi comparative communities. Research preparation, modelling and implementation were AI-assisted.
 
-**The historical evidence, the population scenarios and the animation's geography are different layers.** A dot represents people in the selected reconstruction. It is not a verified medieval headcount, a point census, a biological definition of ethnicity or proof of an exact itinerary. The modern part models selected mobility and regional populations; it does not enumerate every Roma person alive today.
+**The historical evidence, population scenarios and animation geography are different layers.** A dot represents people in the selected reconstruction. It is not a verified medieval headcount, a point census, a biological definition of ethnicity or proof of an exact itinerary. The modern part models selected mobility and regional populations; it does not enumerate every Roma person alive today.
 
-This document describes the **15 November 2026 dispersed-footprint/smooth-camera snapshot**, including the broader France/Germany and Anatolian distributions. It does not describe the earlier thin-ribbon layout or the earlier camera that repeatedly fitted changing population bounds. The display ends in 2025; that is a chosen interpretation of the supplied report's open-ended “present”, not a new 2025 census.
+This document describes the **16 November 2026 continuous-journeys revision**. It supersedes the 15 November dispersed-footprint/smooth-camera snapshot. The new version connects visible South Asian origins through Iranian and Anatolian stages, replaces sudden destination-support jumps with progressive descendant calibration, and lengthens individual cohort transits. The broader France/Germany and Anatolian footprints remain. The display ends in 2025 as an interpretation of the report's open-ended “present,” not a new 2025 census.
 
 ## 1. What was prepared
 
 The retained input is an unpublished, undated supplied synthesis, *Cartographic and Historical Synthesis: Romani Migrations from South Asia to the Global Diaspora* (`REPORT`). Its author and original publication provenance were not established. It contains seven broad historical phases and 28 numbered wave rows, W-01–W-28. Its citations are research leads and attributed claims, not 28 independently verified datasets.
 
-The prepared edition contains:
-
 | Layer | Contents | Role |
 | --- | --- | --- |
-| Supplied evidence | 28 original wave excerpts, their wording, dates, native names, cited URLs, alternative quantities and qualifications | Preserved privately, including the complete original synthesis |
-| Normalized research | Those 28 rows plus 15 separately sourced Near Eastern/Anatolian presence records | A traceable catalogue, not a count of distinct peoples |
-| Geographic model | 56 journey definitions and 48 standing population reservoirs | Reconstructed movement, staging and resident footprints |
-| Demographic model | Low/central/high estimates, shared allocations, six loss schedules and 41 support-addition schedules | Explicit numerical scenarios and accounting |
+| Supplied evidence | 28 original wave excerpts, wording, dates, native names, cited URLs, alternative quantities and qualifications | Preserved privately, including the complete original synthesis |
+| Normalized research | 28 original rows plus 15 separately sourced Near Eastern/Anatolian presence records | A traceable catalogue, not a count of distinct peoples |
+| Geographic model | 62 journey definitions and 54 standing population reservoirs | Connected movement, staging and resident footprints |
+| Demographic model | Three South Asian opening roots, shared allocations, 6 loss schedules and 35 progressive descendant-support schedules | Explicit low/central/high scenarios and accounting |
 | Display model | Fixed population unit, enlarged outlined dots, filters, destination/group colours, a smooth camera path and regional continuation cue | Presentation choices |
 
-The entry manifest is [public/projects/roma.json](../../../site/atlas/projects/roma.json). The working artifacts are `roma-migrations.atlas.json`, `.journeys.json`, `.population.json`, `.ledger.json`, `.geography.json`, `.extensions.json`, `.register.json` and `.review.json` under `public/data/research/`. The application joins the separate journey, population and ledger files at load time; an empty migration array in the catalogue shell is not an empty map.
+The entry manifest is [public/projects/roma.json](../../../site/atlas/projects/roma.json). Working artifacts are `roma-migrations.atlas.json`, `.journeys.json`, `.population.json`, `.ledger.json`, `.geography.json`, `.extensions.json`, `.register.json` and `.review.json` under `public/data/research/`. The application joins journey, population and ledger files at load time; an empty migration array in the catalogue shell is not an empty map.
 
-The complete original research and its verbatim excerpts belong in the private source/archive copy. A public release can retain the derived model and this explanation while removing private source reproductions. Public sanitization changes file hashes even when model values are preserved. The snapshot identifiers below describe the complete prepared working artifacts, not an assertion that a sanitized public JSON has the same bytes.
+Complete original prose and verbatim excerpts belong in the private source/archive copy. A public release can retain the derived model and this explanation while removing private source reproductions. Sanitization changes file hashes even when model values are preserved. Snapshot identifiers below describe the complete prepared working artifacts, not a claim that sanitized public JSON has identical bytes.
 
 ## 2. Identities, terminology and evidence
 
@@ -49,20 +45,52 @@ Most historical narratives reach this project through modern scholarship or inst
 
 ## 3. Chronology and routes
 
-The 200 CE opening is a broad pre-exodus display convention. The dossier's linguistic contact zones and genetic chronology do not document an exact departure in 200, 400 or 500 CE. Likewise, 1054, 1323, 1348, 1384, 1385 and later municipal dates are treated as reported attestations whose identification and preservation need checking, not a sequence of newly created populations arriving on those exact dates.
+The 200 CE opening is a broad display convention. Linguistic contact zones and genetic chronology do not document an exact departure in 200, 400 or 500 CE. Likewise, 1054, 1323, 1348, 1384, 1385 and later municipal dates are reported attestations whose identification and preservation need checking, not newly created populations arriving on those exact dates.
 
-Broad periods are spread into reconstructed movement windows. Staging connects Central/Northwestern South Asia, Persia, Armenia, Byzantine Anatolia, the Balkans and later regional destinations. Named source places are distinguished from intermediate geometric controls. Land connectors use present-day coast-aware geography; maritime or mixed legs are explicit for island, Atlantic and other necessary crossings. The land search uses a roughly 0.04-degree A* grid, not a calibrated historical climate/slope least-cost model.
+### Indian origins and visible geographic handovers
 
-The routes are plausible display reconstructions. They are not surveyed itineraries, documented caravan stops, proof of an exclusive highway or a reconstruction of every historical coastline and river channel. A path does not turn a presence record into direct evidence of movement along that path.
+All three opening stocks are in South Asia. Foreign reservoirs start at zero and receive actual incoming transfers. The European Romani, Dom and Lom scenarios remain independently identified; sharing geography does not establish one documented exodus or a biological split.
 
-There are 41 land-corridor journeys and 15 mixed land/maritime journeys. Some numerical semantics require particular care: W-08's approximately-1520 stock scenario is back-projected into a reconstructed 1100–1300 regional distribution; W-12's 1530 stock is represented across 1420–1530. Neither is an observed count of migrants crossing a border in those earlier years. W-20's shared Southern Vlax debit pool and Turkey-to-Greece path are accounting/geographic choices, not proof of a preceding Kosovo-to-Turkey itinerary.
+| Opening stock | Location | Low / central / high | Start |
+| --- | --- | --- | ---: |
+| INDIC-CORE | Ganga–Yamuna interfluve approaches | 5,000 / 15,000 / 40,000 | 200 |
+| DOM-INDIA | Separate comparative Sindh/Indus bank corridor | 3,000 / 10,000 / 25,000 | 200 |
+| LOM-INDIA | Separate Lom comparative northwestern Indian river plains | 1,000 / 3,000 / 7,500 | 200 |
 
-Two early alternatives remain in the research register with `render: false`:
+Their combined opening stock is **9,000 / 28,000 / 72,500 people**. These model priors do not claim a counted South Asian ethnic population in 200 CE. The Dom and Lom origin priors were moved to the opening so they can visibly precede the comparative foreign distributions; they are not extra debits from the European founder.
 
-- The contested **Ghaznavid military-koiné proposal**, approximately 1001–1040, associated with W-04.
-- The proposed **Syria-to-Anatolia Zutt connection** associated with de Goeje and W-03/W-04.
+The active main sequence is `INDIC-CORE → NW-INDIA → IRAN → ARMENIA → ANATOLIA-EAST → BYZANTIUM`. The independent Dom comparison follows `DOM-INDIA → DOM-IRAN → DOM-ANATOLIA → DOM-SYRIA → DOM-TIGRIS`, then the Iraqi regional allocations. Lom follows `LOM-INDIA → LOM-IRAN → LOM-COMPARATIVE → LOM-ARMENIA`. An Iranian path control alone is no longer treated as a substitute for an occupied staging region.
 
-They do not create additional founding migrants. This edition does not provide a fully implemented alternate-route scenario switch for those proposals. Its active main Roma route follows the supplied linguistic/genetic reconstruction; Dom and Lom remain independent comparisons. Linguistic group labels describe model categories, not measured ancestry fractions or a map of modern language replacement.
+| Journey / identity | Standing handover | Display interval | Requested cohort transit | Low / central / high |
+| --- | --- | --- | --- | --- |
+| W-01 · Origin | INDIC-CORE → NW-INDIA | 200–400 | 150 years | 5,000 / 15,000 / 40,000 |
+| W-02 · Dom comparative | DOM-INDIA → DOM-IRAN | 200–450 | 150 years | 3,000 / 10,000 / 25,000 |
+| DOM-IRAN-ANATOLIA · Dom comparative | DOM-IRAN → DOM-ANATOLIA | 400–650 | 150 years | 3,000 / 10,000 / 25,000 |
+| DOM-ANATOLIA-SYRIA · Dom comparative | DOM-ANATOLIA → DOM-SYRIA | 650–900 | 120 years | 20,000 / 37,000 / 55,000 |
+| DOM-SYRIA-IRAQ · Iraq comparative | DOM-SYRIA → DOM-TIGRIS | 850–1150 | 120 years | 5,000 / 10,000 / 20,000 |
+| W-04 · Early Romani | NW-INDIA → IRAN | 500–700 | 120 years | 1,500 / 4,000 / 10,000 |
+| ROMANI-IRAN-ARMENIA · Early Romani | IRAN → ARMENIA | 650–850 | 120 years | 1,500 / 4,000 / 10,000 |
+| LOM-INDIA-IRAN · Lom comparative | LOM-INDIA → LOM-IRAN | 350–600 | 150 years | 1,000 / 3,000 / 7,500 |
+| LOM-IRAN-ARMENIA · Lom comparative | LOM-IRAN → LOM-COMPARATIVE | 600–850 | 150 years | 1,000 / 3,000 / 7,500 |
+| W-05 · Lom comparative | LOM-COMPARATIVE → LOM-ARMENIA | 850–1050 | 100 years | 1,000 / 3,000 / 7,500 |
+| W-06 · Early Romani | ARMENIA → ANATOLIA-EAST | 850–1000 | 80 years | 5,000 / 12,000 / 25,000 |
+| ROMANI-ANATOLIA-MARMARA · Early Romani | ANATOLIA-EAST → BYZANTIUM | 950–1100 | 100 years | 5,000 / 12,000 / 25,000 |
+
+Successive stage totals often describe the same people and must not be summed as unique migrants. Each handover debits its occupied source and credits its destination. Exact stages and intervals above are geographic/display reconstructions, not newly verified travel records. Multi-generation cohort timing is an animation parameter: a 150-year transit is not a claim that one household travelled for 150 years.
+
+### Original W-02/W-03 chronology and the comparative display
+
+Original W-02 retains the Sasanian traditions dated **224–241 and 420–438 CE**, including workers/musicians, the Persian Gulf and lower Tigris. Original W-03 describes a **late-seventh-century lower-Tigris-to-northern-Syria** forced transfer and attributes 27,000 people to that account. Its identity, source chain and relationship to later Dom communities remain qualified. Those original directions and textual dates have not been rewritten or reversed.
+
+The active **India → Iran → Anatolia → Syria → Iraq** comparison is a separately labelled, user-directed continuity reconstruction. Its interpolated approach and southward branches are not presented as W-03's documented itinerary. It retains the source scenario quantities as modelling references while making the changed direction and timing explicit. It does not prove a universal ancestry for Iraqi Kawliya, Dom-related or northern communities, and it does not create a second European Romani founder. Modern presence reports do not establish the early itinerary.
+
+### Other route and chronology choices
+
+There are 47 land-corridor journeys and 15 mixed land/maritime journeys. Land connectors use present-day coast-aware geography, with a roughly 0.04-degree A* grid; they are not a calibrated historical climate/slope least-cost model. Maritime legs are explicit for necessary island, coastal and overseas crossings. Named historical places remain distinct from geometric control nodes.
+
+W-08's approximately-1520 stock scenario is back-projected into a reconstructed 1100–1300 regional distribution; W-12's 1530 stock spans 1420–1530. W-10's approach now begins in 1300 to accommodate visible staged transit before the later municipal network. These are not observed counts of earlier border crossings. W-20's Southern Vlax debit pool and Turkey-to-Greece path are accounting/geographic choices, not proof of a preceding Kosovo-to-Turkey itinerary. W-19's two Americas journeys now use a reconstructed 1890–1914 interval and 10-year requested cohort transits, after the European staging population is funded. The source's broader post-1861/1865–1914 context remains preserved; 1890 is not relabelled a documented first arrival.
+
+The contested Ghaznavid military-koiné proposal and proposed Syria-to-Anatolia Zutt connection remain in the original register as alternatives with `render:false`. They create no additional founders; this edition does not implement a full alternate-route scenario switch. Its active comparative continuity route is separately disclosed above. Missing exact stops or manuscript-level itinerary proof does not prevent a reconstructed route from being displayed.
 
 ### Corrections and unresolved chronological conflicts
 
@@ -125,39 +153,43 @@ The source-to-reference crosswalk below identifies the supplied citations behind
 
 There is no default multiplication of ancestry percentages, a genetic bottleneck estimate or a military roster into “all Roma”. The edition uses explicit record/scenario estimates. The conversion ratios above are not established universal demographic constants.
 
-## 5. Cohort accounting, support additions and deaths
+## 5. Cohort accounting, descendant support and deaths
 
-People occupy standing reservoirs before departing. Departure debits a named source slot; the same weighted people travel and then credit a destination slot. Arrivals persist. Splitting a journey allocates its people among destinations once, rather than copying a full parent population onto each branch.
-
-With automatic growth disabled, the global bookkeeping relationship is:
+People occupy standing reservoirs before departure. A named source slot is debited, the weighted people travel, and a destination slot is credited. Arrivals persist; branches partition the source once. The returning western reconnaissance circuit does not create a full permanent population at each municipal stop.
 
     living at origins + travelling + living at destinations
-      = initial priors + dated support additions − cumulative deaths
+      = opening stock + dated descendant support − cumulative deaths
 
-Transfers cancel in the global sum. The exact residual weight of a partial dot is retained. Low/high scenarios and alternative dot units are tested separately. A geographically hidden or filtered dot is still part of the underlying accounting unless the filter explicitly selects a narrower cohort for inspection.
+Transfers cancel in the global sum. The exact residual weight of a partial dot is retained. Low/high scenarios and alternative dot units are checked separately. Cropping and filters do not delete people from the underlying full-world accounting.
 
-The primary European reconstruction has one founding exodus. Dom and Lom comparative stocks have separate initial/support priors. W-07, W-13, W-15, W-18, W-19, W-26, W-27 and W-28 have shared allocations; a catalogue row, branch or destination is not a separate extra copy of its parent. The small western reconnaissance circuit returns to its source pool instead of creating a full population at each recorded municipal stop.
+### Zero automatic growth, explicit progressive descendant calibration
 
-### Growth is zero; later support is explicit
+The ledger declares **`fixedAnnualRate:0`**. It adds no automatic logistic growth. Later stock/mobility scenarios are reconciled through **35 ranged schedules**, all marked **`descendantSupport:true`**, with **no instantaneous support entries**. They are local later-generation calibration, not observed births, verified assimilation, independent destination founders, new source headcounts or ancestry-percentage conversions. Reservoir capacities remain engineering bounds rather than measured ecological carrying capacities.
 
-The Roma ledger sets **`fixedAnnualRate: 0`**. It does not use the Arabian edition's fitted logistic-growth rate. Later descendant-stock or modern-mobility targets are reconciled through 41 dated support additions with stated low/central/high amounts and target stocks. These are bookkeeping priors: not observed births, verified assimilation, new source headcounts or a claim that all later descendants left India together. Reservoir capacity values are engineering bounds, not measured historical ecological carrying capacities.
+Every such addition requires a surviving resident lineage. It cannot make an empty foreign reservoir occupied. New standing slots are classified as growth and inherit the resident lineage's local dispersal state, so later generations join the existing settlement front rather than appearing immediately across a mature regional footprint. Stable slots preserve arrivals, later departures and reverse scrubbing. This display lineage does not trace real individuals or establish a verified genealogy.
 
-This matters over a 1,825-year display window. A 4,000-person founding-exodus scenario and a much larger later stock cannot be treated as the same unchanged headcount. The model makes the added support visible in its population/ledger artifacts instead of silently duplicating cohorts or inferring population from genetic admixture.
+Preparation extracts transfer/death demands using temporary generous balances, which are not delivered. For each bookkeeping epoch it measures the maximum cumulative debit/standing-target shortfall, rounds needed support up to 500 people and maintains low ≤ central ≤ high. It then places support progressively after actual incoming presence and before the relevant funding need, retaining a surviving lineage between support periods. Thus an epoch embedded in a support ID is not necessarily the schedule's start year. The complete actual start/end intervals and triples appear in Appendix A. The epoch boundaries remain 200, 500, 800, 1100, 1300, 1450, 1700, 1850, 1938, 1945, 1960, 1988, 2000 and 2026.
 
-The support calculation is fitted to the chosen model, not to an independently observed fertility series. Preparation first uses temporary generous balances to extract the transfer schedule; those temporary balances are not delivered. For each pool and epoch it then measures the largest cumulative departure/loss deficit and any standing-target shortfall, rounds needed support upward to 500 people, and enforces low ≤ central ≤ high. The sole delivered initial stock is W-01's 5,000/15,000/40,000. Other pools begin at zero and receive incoming transfers and/or explicit support.
+Only the three declared South Asian opening roots have initial people; all foreign pools start empty. Later-generation support changes the model through time without pretending that every much larger later stock left India together. The fitting process follows selected scenario targets rather than an independently observed fertility series. Passing conservation checks establishes internal numerical consistency by construction, not the historical magnitude of the assumptions.
 
-The bookkeeping epoch boundaries are 200, 500, 800, 1100, 1300, 1450, 1700, 1850, 1938, 1945, 1960, 1988, 2000 and 2026. Instant priors enter no earlier than the pool's start. There are 30 instantaneous priors and 11 ranged modern additions. Their complete numerical schedule is in Appendix A. This means a passing conservation test verifies the declared accounting **by construction**; it does not independently validate the historical size of a pool.
-
-Four later stock targets are also distinct from earlier movements:
+Four later standing targets remain distinct from earlier movements:
 
 | Pool | Target year | Low / central / high |
-| --- | ---: | --- |
-| Balkan core | 1520 | 45,000 / 75,000 / 120,000 |
-| Central Romani core | 1780 | 35,000 / 50,000 / 70,000 |
-| Danubian core | 1855 | 150,000 / 200,000 / 250,000 |
-| Iberian core | 1749.5 | 10,000 / 12,000 / 15,000 |
+| --- | --- | --- |
+| BALKAN-CORE | 1520 | 45,000 / 75,000 / 120,000 |
+| CENTRAL-CORE | 1780 | 35,000 / 50,000 / 70,000 |
+| DANUBIAN-CORE | 1855 | 150,000 / 200,000 / 250,000 |
+| IBERIAN-CORE | 1749.5 | 10,000 / 12,000 / 15,000 |
 
-As an implementation example, the central model at 2025 has 2,020,500 living person-units and 350,500 cumulative deaths, balanced against 2,371,000 initial-plus-support units. The modern western stock contains 60,000 from W-26, 200,000 from W-27 and 450,000 from W-28: 710,000 within this model. These are accounting outputs of selected scenarios, not independently established real-world population totals.
+The cumulative totals at the display's 2025 endpoint are:
+
+| Scenario | Opening stock | Progressive support | Cumulative deaths | Living at 2025 |
+| --- | --- | --- | --- | --- |
+| low | 9,000 | 1,269,500 | 220,500 | 1,058,000 |
+| central | 28,000 | 2,343,000 | 350,500 | 2,020,500 |
+| high | 72,500 | 4,124,000 | 500,500 | 3,696,000 |
+
+The actual full-world Engine was checked at 2025 in all three scenarios; the maximum absolute accounting residual was less than 0.001 people. These are accounting outputs of selected scenarios, not a census of all present-day Roma. The modern western stock includes 60,000 from W-26, 200,000 from W-27 and 450,000 from W-28 in the central model: 710,000 across those allocations.
 
 ### Shared geographic suballocations
 
@@ -185,21 +217,20 @@ The post-1989 and post-visa pools W-27/W-28 can overlap real individuals. For th
 
 ## 6. The Near Eastern and Anatolian extension
 
-Fifteen extension records supplement the original 28 without rewriting them. They use the ERRC, IILHR and MERI sources E01–E05. Their fieldwork dates establish regional presence and social conditions. Their reconstructed earlier redistribution windows do not turn those observation dates into arrivals.
+Fifteen extension records supplement the original 28 without rewriting them. ERRC, IILHR and MERI sources E01–E05 document modern regional presence and social conditions. Neither their fieldwork dates nor their broad estimates establish the earlier comparative itinerary or a 2025 local census.
 
 | Comparative/regional model | Low / central / high | Allocation and scope |
 | --- | --- | --- |
-| One Syrian W-03 standing comparative cohort | 15,000 / 27,000 / 35,000 | 30% Damascus/Barada–Ghouta margins; 15% Homs–Hama; 15% southeastern Anatolia; 40% retained northern Syria |
-| Retained Iraqi reference cohort | 5,000 / 10,000 / 20,000 | Independent illustrative Iraqi-related prior; the 27,000 W-03 transfer does not exhaust all Iraqi communities |
-| One modern Iraqi national scenario | 50,000 / 100,000 / 200,000 | 25% Basra; 20% Nasiriyah/Thi Qar; 15% Diwaniya; 15% Amara/Maysan; 15% Baghdad; 10% northern Iraq/Kurdistan |
-| Historical Turkish Romanlar reference allocation | 6,000 / 13,000 / 26,000 | Separate regional reference cohort spread across a reconstructed 1300–1900 interval |
-| One modern Turkish Romanlar scenario | 500,000 / 1,000,000 / 2,000,000 | 40% Thrace/Marmara; 35% Aegean; 15% Mersin–Adana; 5% Ankara; 5% Black Sea |
+| Shared Syrian staging transfer before its Iraqi branch | 20,000 / 37,000 / 55,000 | Includes the retained Syrian and Iraqi reference allocations once |
+| Retained Syrian reference allocation | 15,000 / 27,000 / 35,000 | 30% Damascus/Barada–Ghouta; 15% Homs–Hama; 15% southeastern Anatolia; 40% northern Syria |
+| Historical Iraqi reference branch | 5,000 / 10,000 / 20,000 | Leaves the shared Syrian staging population for the lower Tigris; no independent initial Iraqi stock |
+| Modern Iraqi national scenario | 50,000 / 100,000 / 200,000 | 25% Basra; 20% Nasiriyah/Thi Qar; 15% Diwaniya; 15% Amara/Maysan; 15% Baghdad; 10% northern Iraq/Kurdistan |
+| Historical Turkish Romanlar reference allocation | 6,000 / 13,000 / 26,000 | Shared regional reference cohort across a reconstructed 1300–1900 interval |
+| Modern Turkish Romanlar scenario | 500,000 / 1,000,000 / 2,000,000 | 40% Thrace/Marmara; 35% Aegean; 15% Mersin–Adana; 5% Ankara; 5% Black Sea |
 
-The fractions are display assumptions, not surveyed local headcounts. Modern support is staged across 1900–2013 for Romanlar and 1900–2024 for Iraq. It is not a sudden arrival at the report's publication date or an observed birth series.
+The shared 20/37/55k transfer includes explicit later-generation support in the arrived comparative Anatolian stock; it is not the original W-03 forced-transfer count. Those stage totals must not be added to their destination subsets. Local fractions are display assumptions. Modern support runs progressively over 1900–2013 for Romanlar and 1900–2024 for Iraq, after earlier resident lineages; it is not a mass arrival at a report's publication date or an observed birth series.
 
-E04's 500,000–5,000,000 Turkish envelope covers a **combined** category including Roma, Dom, Lom and Abdal. The atlas does not copy it as a Romanlar-only census or assign the whole total to every region. Its 500,000/1,000,000/2,000,000 Romanlar-only scenarios are separately chosen modelling values. Dom and Lom comparative stocks remain outside that one national Romanlar allocation.
-
-The Iraqi range also has uncertain taxonomy and includes northern/Kurdistan groups. It is not a verified European-Roma or Dom-only national census. The extension does not claim that all Kawliya or other Iraqi communities have one ancestry, language or migration history. ERRC's Syrian report supports modern Dom presence around Damascus and other cities; it does not provide a Damascus population count or establish a medieval arrival there.
+E04's 500,000–5,000,000 Turkish envelope combines Roma, Dom, Lom and Abdal. The model's separately chosen Romanlar-only 500k/1m/2m scenarios cannot be attributed to it as a census; Dom and Lom remain separate. The Iraqi category is also diverse and includes northern/Kurdistan groups, with uncertain connections to European Roma or particular Dom communities. ERRC's Syrian report supports modern Dom presence around Damascus and elsewhere, without counting Damascus residents or establishing medieval arrival. The new ancestral display is one explicit hypothesis, not a uniform ethnicity, language or origin for every community.
 
 ## 7. Geography and population footprints
 
@@ -207,7 +238,7 @@ The geographic inputs and their roles are catalogued as G01–G06 below. Present
 
 ### Broad area fields, not a line of resident cities
 
-The current placement has 48 resource-informed profiles. Eleven use broad, irregular two-dimensional area fields: the modern western, Sinti and wider diaspora profiles; Byzantine Anatolia; five Romanlar regional profiles; southeastern Anatolian Dom; and the Lom comparative profile. Other localities retain smaller river, coast, valley or dry-marsh-margin footprints where appropriate.
+The current placement has 54 resource-informed profiles. Eleven use broad, irregular two-dimensional area fields: the modern western, Sinti and wider diaspora profiles; Byzantine Anatolia; five Romanlar regional profiles; southeastern Anatolian Dom; and the Lom comparative profile. Other localities retain smaller river, coast, valley or dry-marsh-margin footprints where appropriate.
 
 France is represented through northern/Paris basins, Loire/Centre, southwestern Aquitaine and Rhône/foothill components. German components cover northern lowlands, Rhine–Ruhr/Hesse, central/eastern basins and southern Danube/foothill areas, with Low Countries and wider central-European components as appropriate. Anatolia uses broader Marmara, Aegean/western interior, central plateau, Çukurova and Black Sea fields. These are reconstructed physical-region envelopes, not modern national boundary fills.
 
@@ -231,60 +262,67 @@ Default colours identify destinations; group-colour mode and group/destination f
 
 The current interface uses people moving between standing populations and persisting after arrival. Some elaborate glyph/ring protocols proposed in the original brief were suggestions rather than implemented features. The public explanation here describes the actual fixed-unit dot renderer. Coercion, detention, presence and uncertainty remain attributes of the underlying records and their details.
 
-### A deterministic smooth opening and a regional later view
+### Smooth opening and regional later view
 
-The opening camera records the actual occupied footprint once. It then interpolates projected centre and zoom through four display poses:
+The camera records the actual opening occupied footprint once, then interpolates projected centre/zoom through these poses using the prepared narrative clock:
 
-| Model year | Geographic pose | Position in the default playback |
-| --- | --- | ---: |
+| Model year | Geographic pose | Default playback position |
+| --- | --- | --- |
 | 200 | Actual opening occupied footprint | 0 seconds |
-| 700 | `[42°E, 22°N, 85°E, 48°N]` corridor view | 13 seconds |
-| 900 | `[20°E, 25°N, 80°E, 55°N]` intermediate view | 23 seconds |
-| 1100 | `[13°W, 27°N, 58°E, 62°N]` Europe/Middle East | 33 seconds |
+| 500 | `[32, 22, 85, 48]` [west, south, east, north] | 12 seconds |
+| 800 | `[28, 24, 80, 55]` [west, south, east, north] | 27 seconds |
+| 1100 | `[-13, 27, 58, 62]` [west, south, east, north] | 42 seconds |
 
-Quintic interpolation has zero velocity and acceleration at each pose. It uses the narrative phase clock, so new stocks and fluctuating dot bounds do not make the camera chase them. Reverse scrubbing, restart and the same year/viewport produce the same pose.
+Quintic interpolation has zero velocity and acceleration at each pose. New stocks and fluctuating dot bounds do not make the camera chase them. Reverse scrubbing, restart and the same year/viewport reproduce the same pose.
 
-The default later all-group view stays on Europe and the Middle East. A regional rule begins at 900 and reaches its final frame by 1100. The foreground crop and matching legend policy keep off-region populations from dictating that default composition. **Cropping is presentation, not demographic deletion.** India, Africa and the Americas remain in the model and can be inspected through full-model views and explicit filters. Manual pan/zoom and filtered results bypass the scripted default; Home resumes it.
+The default later all-group view stays on Europe and the Middle East. Its regional rule begins at 900 and reaches the final frame by 1100. Cropping is presentation, not demographic deletion. India, Africa and the Americas remain available through full-model views and explicit filters. Manual navigation and filtered results bypass the scripted default; Home resumes it. Independent saved display preferences remain preserved.
 
-From 1538 a passive bottom-left caption, “↙ Some went to Brazil and the Americas”, records the continuation without forcing a transatlantic zoom-out. The arrow is not an extra population marker or evidence for a specific first-arrival year.
+From 1538, a passive bottom-left caption, “↙ Some went to Brazil and the Americas,” records the continuation without forcing a transatlantic zoom-out. It is not an extra population marker or a claim of a securely established first arrival in Brazil in 1538.
 
-### Two-phase clock and encoded duration
+### Two-phase clock and visible cohort travel
 
 | Phase | Rate | Screen time |
-| --- | ---: | ---: |
-| 200–500 CE | 100 years/second | 3 seconds |
+| --- | --- | --- |
+| 200–500 CE | 25 years/second | 12 seconds |
 | 500–2025 CE | 20 years/second | 76.25 seconds |
 | Final hold | No historical time advanced | 2 seconds |
-| **Complete MP4** | Same timeline clock as the app's prepared default | **81.25 seconds** |
+| Complete schedule | Same prepared clock in app and export | 90.25 seconds |
 
-Adaptive slowdowns are disabled for these phases. The boundary at 500 is an editorial way to compress the quiet opening; it is not an exact historically observed departure. Calendar playback is not the speed at which a caravan, household or refugee group travelled. Independent saved display preferences remain separate from the prepared defaults.
-
-The release window and an individual dot's traversal time are different parameters. Most original journeys request a one-model-year transit, which is about 0.05 seconds in the 20-years/second phase; the Near Eastern extensions use 20-model-year transits, about one second. The within-window rule shortens some tiny detention/circuit transits further. Consequently, some short individual transfers are rapid or undersampled at 24 fps even while the larger release/distribution unfolds over a long interval. The smooth-camera correction changes framing, not these demographic dates or transit settings. The display is not a measured historical journey-duration model.
+Adaptive rate changes are disabled. The 500 CE boundary is a display convention, not an observed exact departure. The faster opening still includes visible occupied origins and movement. A release window and one cohort's traversal time are different parameters: staged early routes request 80–150 model years of travel, corresponding to several seconds in this schedule. Most later routes use 60-year requests, with shorter routes governed by their available historical/display windows. Actual encoded moving-dot evidence is reported with the video QA below. These transit values are animation choices, not historical caravan speeds or personal lifetimes.
 
 ## 9. Reproducibility and verification
 
-Relevant implementation files are [the Roma builder](../../../scripts/prepare-roma-atlas.mjs), [the broad-area sampler](../../../scripts/roma-landscapes.mjs), [population ledger](../../../src/data/population-ledger.ts), [standing slots](../../../src/sim/standing-slots.ts), [narrative camera](../../../src/map/narrative-camera.ts) and [video exporter](../../../scripts/export-roma-video.mjs). The detailed local guide is private preparation notes.
+Relevant implementation files are [the Roma builder](../../../scripts/prepare-roma-atlas.mjs), [broad-area sampler](../../../scripts/roma-landscapes.mjs), [population ledger](../../../src/data/population-ledger.ts), [standing slots](../../../src/sim/standing-slots.ts), [narrative camera](../../../src/map/narrative-camera.ts) and [video exporter](../../../scripts/export-roma-video.mjs). The local guide is ROMA_ATLAS.md (private preparation notes).
 
-The finished video is identified by the stem `Roma-Migrations-Dispersed-Smooth-200-2025-20261115T175312Z`. It is H.264/yuv420p, 1920×1080, 24 fps, 1,950 frames, and 81.250000 seconds. Its audit JSON records input hashes, actually loaded source snapshots, phase rates, camera trace, probe/decode results and isolated-browser playback/seeks. No monitored or loaded source changed during that capture.
+The completed local video is `outputs/Roma-Migrations-Continuous-Journeys-200-2025-20261116T134954Z.mp4`, with its sibling `Roma-Migrations-Continuous-Journeys-200-2025-20261116T134954Z.json` audit. It is **90.250000 seconds**, **2,166 frames**, 1920×1080 at 24 fps, H.264/yuv420p, 67,516,781 bytes. The timeline occupies 88.25 seconds and the closing hold 2 seconds. Full FFmpeg decoding and isolated-browser playback passed. Three seeks at 0.09025, 45.125, 90.15975 seconds decoded correctly; playback advanced 0.907705 seconds. Both monitored and actually loaded source-change lists are empty, and the audit records no errors. The file's SHA-256 is `31267ce3fcb30025dbd767fb742d0fe6b9d0e90819eb822d1d6eae22c3ec15c9`.
 
-Software evidence for this snapshot includes nine Roma model tests, 30 focused camera/presentation tests, TypeScript and production-build checks, 12 real-project browser check groups and nested-path asset checks. Browser checks cover sources, filters, estimate settings, independent storage, saved marker-size preferences, smooth/repeatable opening, manual/filter bypass, regional crop and continuation cue, Basra/Damascus records and narrow layouts. Both desktop and narrow default late views showed 1,984 visible dots; that rendered regional count is not a full-world census or an exact 1,984,000-person population measurement.
+All 2,166 encoded camera poses were measured. Maximum pan is 7.063725 pixels/frame and maximum zoom change 0.01101/frame; maximum pan acceleration is 0.101814 pixels/frame² and zoom acceleration 0.000118/frame². There are 0 inward-zoom frames and 0 horizontal reversals.
 
-All 1,950 encoded camera poses were measured: maximum pan 6.821 pixels/frame, maximum zoom change 0.010164/frame and no horizontal reversals or inward zoom frames. Full decoding and actual browser playback/seeks passed; decoded opening, middle and ending frames were visually inspected. A later shared full-suite run completed **399 tests, 399 passed, 0 failed**. It superseded an earlier temporary 393/397 result while unrelated Indo-European preparation was in progress.
+The full timeline engine proof sampled 2,119 frames and found maximum population-accounting error 0.000041 people. Its 17,406 early moving-dot samples were in view without regional clipping; minimum edge clearance was 20.662732 pixels. All 54 pools connect to the Indian opening roots, and all 35 progressive support schedules require a living resident lineage. In the export's per-frame motion records, every recorded early-route dot position was visible. Fully observed early cohorts crossed progress 0.08→0.92 over at least 24 frames and passed the 98% visibility criterion; a partially recorded tail is not presented as a complete-journey check.
 
-These checks establish implementation behaviour, internal accounting and playable output. **They do not establish independent historical verification** of every citation, exact route, date, population estimate, resource weight or proposed genealogy. Source metadata/link checks are narrower than reading an entire book. Remaining conflicts and inaccessible citations are identified below.
+Individual transits in four dated coercive episodes remain shorter than one frame at the fixed clock: `W-16-DETAINED`, `W-16-RELEASE`, `W-23`, `W-24`. Their collective release windows can span several frames even when a particular dot's transit is shorter than one frame. Across those four episodes, 52 unit slots have no sampled moving frame. They retain their narrow detention/deportation/return timing and are disclosed exceptions; no ordinary journey has an unsampled transfer. Detention, deaths and returns still debit and credit the same funded populations.
+
+Decoded frames at 5, 15 and 25 seconds and the ending were visually reviewed. They show the physical basemap, visible India→Iran→Anatolia progression, the southern Syrian branch, Iraqi stocks appearing after arrivals, and the retained dispersed European/Anatolian ending.
+
+Validation passed **10 Roma regressions**, all nine estimate/unit combinations and every actual journey-arrival window; **40 focused continuity/lineage/camera tests**; the final **410-test full suite with zero failures**; TypeScript checking; the production build; and the Pages asset/path check. Twelve isolated-browser groups passed for sources, filters, scenarios, storage/preferences, camera controls, regional footprints and narrow layouts, with 1,984 late-view dots. That browser run preceded the final unit-fit/W-19 timing adjustment; the final frozen bundle is independently covered by the model/engine checks and completed export above. The rendered regional dot count is not a world census. Earlier video metrics describe a superseded snapshot.
+
+These checks establish implementation behaviour, connected population accounting and playable output. They do not establish independent historical verification of every citation, exact route, date, population scenario, resource weight or proposed genealogy. Source metadata/link checks are narrower than reading an entire book. Remaining conflicts and inaccessible citations are retained in the catalogue.
 
 ### Snapshot identifiers
 
-SHA-256 values for the complete working snapshot:
+SHA-256 values for the complete prepared working snapshot, before any public sanitization:
 
 | Artifact | SHA-256 |
 | --- | --- |
 | Original supplied text, held privately | `ad528f20b62f64de963ee4107a6e6b209f4a3daacda49d397bb53974f5283ebf` |
-| Prepared atlas catalogue | `fae95c7b1b2803eb0b8e201c326360ba7fade34416c333d9992d1c0f2a52bf91` |
-| Population model | `d3bac066b1c15522a2ffa417b662eaf318fa3dc271054951b765cf07d566b40a` |
-| Ledger | `24d488971f882d29c275a5f84d2816cdaf6533411e50fb8d842a11d10aeaac73` |
-| Geography | `7e6eae2aaa57e7204c629cd14fed67e929712fb7e67d2adf86426f4dab78bb70` |
-| Journeys | `a6012d7823397095facfa57e4f33d25332037ce89f93d9642af4a7bb14c50aca` |
+| Prepared atlas catalogue | `8650f771785af8ce06394ec85b54522b204d2c52c856d9d87a9946f39e9ccda9` |
+| Population model | `83be06341dc44dbe7556838b0ee30764f5f72f0cd807b7fb4d8815c17f912716` |
+| Ledger | `e3cf65e7b629669b79511bfa9514361f8bbf7ed03e9183cbfa583ac10ac1e962` |
+| Geography | `9ac0f8228b641d6dad565358752336abf49446962e4cfd95ae1104fb48a34e33` |
+| Journeys | `f657c1a956ab447a9a9c63a644ecbe56f5e51880e6583c2cf6a7290c703a8827` |
+| Retained source register | `d10f1c25d2216d1b7e345837a92021be727accb362932c8d2b9fe0917e9ea800` |
+| Separate presence extensions | `0f75dffcbf2bfabb356e0910d3f2020393e5787780639166e411f6a605c35709` |
+| Preparation review | `8554b2382514804d497dea89624f5ad3b28b8f6118640674fb9278a994591832` |
 
 ## 10. Sources and access conventions
 
@@ -698,62 +736,54 @@ The irregular physical-region polygons, route controls, resource guides, exclusi
 
 ## 18. Remaining limits and reproducible public explanation
 
-The most consequential uncertainties are the early ethnonym identifications and itineraries; the documentary basis behind several inherited citation snippets; the relationship among Zutt, later Dom and other communities; the conversion of later stock scenarios into earlier distributions; the size and staging of support priors; detention/mortality/return alternatives; the overlap of modern mobile pools; and the local detail of resource footprints and historical geography.
+The most consequential uncertainties are early ethnonym identifications and itineraries; the documentary basis behind inherited snippets; relationships among Zutt, later Dom and diverse Iraqi communities; the difference between original W-02/W-03 chronology and the requested comparative route; conversion of later stock scenarios into earlier distributions; the size and timing of progressive descendant support; detention/mortality/return alternatives; overlap of modern mobile pools; and local resource/historical-geography detail.
 
-This is one explicit, inspectable reconstruction. Internal numerical consistency, more natural dispersal and a smoother camera improve the visualization; they do not resolve those historical questions. A reader should be able to trace a record to the cited work, see whether the cited item is primary, mediated, contextual or unresolved, and then separate that evidence from the choices that made the animation run.
+This is one explicit, inspectable reconstruction. Connected journeys, progressive settlement fronts, internal numerical consistency and a smooth camera improve the visualization without resolving those historical questions. Readers can trace a record to its cited work, see whether the evidence is primary, mediated, contextual or unresolved, and distinguish it from the numerical and geographic choices that make the animation run.
 
-The public document and intended public atlas/model can be published together. Complete supplied prose, private working material and private source history remain in the private archive. Repository sanitization and publication status are maintained by the combined repository's publishing owner and index; the existence of this local Markdown file alone does not establish that a public push or deployment has occurred.
+The public document and intended public atlas/model can be published together. Complete supplied prose, private working material and private source history remain in the private archive. Publication status belongs to the combined repository's publishing owner and index; this local file alone does not establish a push or deployment. The continuous-journeys revision supersedes the previous snapshot's model/video description.
 
-## Appendix A. Complete explicit support-addition schedule
+## Appendix A. Complete progressive descendant-support schedule
 
-The following table is a model-parameter inventory, not a historical birth, immigration or census series. L/C/H means low/central/high people. “Instant epoch prior” is a bookkeeping calibration at a selected date; ranged additions are the later-generation calibration described in section 5. Their sum is not independent evidence of real demographic growth.
+This is a model-parameter inventory, not a historical birth, immigration or census series. All 35 entries are ranged and marked `descendantSupport:true`; no entry seeds an empty foreign destination. The actual dates below govern support, while the epoch embedded in an ID describes its fitting block. Values are people, with six decimal places retained for fitted interval boundaries where necessary. Their sum is not independent demographic evidence.
 
-| Support ID | Pool | Interval | L / C / H | Instant/ranged |
+| Support ID | Pool | Interval | Low / central / high | Semantics |
 | --- | --- | --- | --- | --- |
-| SUPPORT-DOM-INDIA-200 | DOM-INDIA | 420–420 | 3,000 / 10,000 / 25,000 | instant epoch prior |
-| SUPPORT-DOM-TIGRIS-500 | DOM-TIGRIS | 500–500 | 17,000 / 23,000 / 23,000 | instant epoch prior |
-| SUPPORT-DOM-TIGRIS-1100 | DOM-TIGRIS | 1100–1100 | 0 / 1,000 / 1,000 | instant epoch prior |
-| SUPPORT-DOM-TIGRIS-1450 | DOM-TIGRIS | 1450–1450 | 0 / 3,000 / 6,000 | instant epoch prior |
-| SUPPORT-ARMENIA-800 | ARMENIA | 800–800 | 3,500 / 8,000 / 15,000 | instant epoch prior |
-| SUPPORT-LOM-COMPARATIVE-800 | LOM-COMPARATIVE | 850–850 | 1,000 / 3,000 / 7,500 | instant epoch prior |
-| SUPPORT-BYZANTIUM-1100 | BYZANTIUM | 1100–1100 | 41,000 / 64,000 / 98,000 | instant epoch prior |
-| SUPPORT-BYZANTIUM-1300 | BYZANTIUM | 1300–1300 | 4,000 / 11,500 / 21,500 | instant epoch prior |
-| SUPPORT-BYZANTIUM-1450 | BYZANTIUM | 1450–1450 | 4,000 / 7,000 / 12,500 | instant epoch prior |
-| SUPPORT-BYZANTIUM-1700 | BYZANTIUM | 1700–1700 | 0 / 0 / 1,000 | instant epoch prior |
-| SUPPORT-BYZANTIUM-1850 | BYZANTIUM | 1850–1850 | 0 / 1,000 / 3,000 | instant epoch prior |
-| SUPPORT-BALKAN-CORE-1450 | BALKAN-CORE | 1450–1450 | 8,000 / 16,000 / 32,000 | instant epoch prior |
-| SUPPORT-BALKAN-CORE-2000 | BALKAN-CORE | 2000–2000 | 84,500 / 152,500 / 247,500 | instant epoch prior |
-| SUPPORT-DANUBIAN-CORE-1700 | DANUBIAN-CORE | 1700–1700 | 14,000 / 24,000 / 35,000 | instant epoch prior |
-| SUPPORT-DANUBIAN-CORE-1850 | DANUBIAN-CORE | 1850–1850 | 150,000 / 202,000 / 252,000 | instant epoch prior |
-| SUPPORT-DANUBIAN-CORE-2000 | DANUBIAN-CORE | 2000–2000 | 52,000 / 151,000 / 316,000 | instant epoch prior |
-| SUPPORT-CENTRAL-CORE-1300 | CENTRAL-CORE | 1360–1360 | 500 / 1,000 / 1,000 | instant epoch prior |
-| SUPPORT-CENTRAL-CORE-1700 | CENTRAL-CORE | 1700–1700 | 32,000 / 44,000 / 58,000 | instant epoch prior |
-| SUPPORT-CENTRAL-CORE-1938 | CENTRAL-CORE | 1938–1938 | 0 / 6,500 / 14,000 | instant epoch prior |
-| SUPPORT-CENTRAL-CORE-1945 | CENTRAL-CORE | 1945–1945 | 23,000 / 35,000 / 35,000 | instant epoch prior |
-| SUPPORT-CENTRAL-CORE-1960 | CENTRAL-CORE | 1960–1960 | 0 / 10,000 / 35,000 | instant epoch prior |
-| SUPPORT-CENTRAL-CORE-1988 | CENTRAL-CORE | 1988–1988 | 18,000 / 30,000 / 45,000 | instant epoch prior |
-| SUPPORT-CENTRAL-CORE-2000 | CENTRAL-CORE | 2000–2000 | 37,500 / 67,500 / 112,500 | instant epoch prior |
-| SUPPORT-SINTI-CORE-1450 | SINTI-CORE | 1450–1450 | 6,000 / 12,000 / 21,500 | instant epoch prior |
-| SUPPORT-SINTI-CORE-1938 | SINTI-CORE | 1938–1938 | 72,000 / 118,000 / 170,000 | instant epoch prior |
-| SUPPORT-IBERIAN-CORE-1700 | IBERIAN-CORE | 1700–1700 | 7,500 / 8,000 / 10,000 | instant epoch prior |
-| SUPPORT-NE-CORE-1938 | NE-CORE | 1938–1938 | 78,000 / 127,000 / 179,500 | instant epoch prior |
-| SUPPORT-SOUTH-VLAX-1938 | SOUTH-VLAX | 1938–1938 | 8,000 / 13,000 / 20,000 | instant epoch prior |
-| SUPPORT-SOUTH-VLAX-1960 | SOUTH-VLAX | 1960–1960 | 40,000 / 78,000 / 78,000 | instant epoch prior |
-| SUPPORT-SOUTH-VLAX-1988 | SOUTH-VLAX | 1988–1988 | 30,000 / 52,000 / 127,000 | instant epoch prior |
-| MODERN-SUPPORT-IRAQ-BASRA | IRAQ-BASRA | 1900–2024 | 11,250 / 22,500 / 45,000 | ranged later-generation calibration |
-| MODERN-SUPPORT-IRAQ-THIQAR | IRAQ-THIQAR | 1900–2024 | 9,000 / 18,000 / 36,000 | ranged later-generation calibration |
-| MODERN-SUPPORT-IRAQ-DIWANIYA | IRAQ-DIWANIYA | 1900–2024 | 6,750 / 13,500 / 27,000 | ranged later-generation calibration |
-| MODERN-SUPPORT-IRAQ-MAYSAN | IRAQ-MAYSAN | 1900–2024 | 6,750 / 13,500 / 27,000 | ranged later-generation calibration |
-| MODERN-SUPPORT-IRAQ-BAGHDAD | IRAQ-BAGHDAD | 1900–2024 | 6,750 / 13,500 / 27,000 | ranged later-generation calibration |
-| MODERN-SUPPORT-IRAQ-NORTH | IRAQ-NORTH | 1900–2024 | 4,500 / 9,000 / 18,000 | ranged later-generation calibration |
-| MODERN-SUPPORT-ROMANLAR-MARMARA | ROMANLAR-MARMARA | 1900–2013 | 198,000 / 395,000 / 790,000 | ranged later-generation calibration |
-| MODERN-SUPPORT-ROMANLAR-AEGEAN | ROMANLAR-AEGEAN | 1900–2013 | 173,000 / 346,000 / 692,000 | ranged later-generation calibration |
-| MODERN-SUPPORT-ROMANLAR-MEDITERRANEAN | ROMANLAR-MEDITERRANEAN | 1900–2013 | 74,000 / 148,000 / 296,000 | ranged later-generation calibration |
-| MODERN-SUPPORT-ROMANLAR-ANKARA | ROMANLAR-ANKARA | 1900–2013 | 24,500 / 49,000 / 98,000 | ranged later-generation calibration |
-| MODERN-SUPPORT-ROMANLAR-BLACKSEA | ROMANLAR-BLACKSEA | 1900–2013 | 24,500 / 49,000 / 98,000 | ranged later-generation calibration |
+| SUPPORT-DOM-ANATOLIA-500 | DOM-ANATOLIA | 550.01–649.95 | 17,000 / 27,000 / 30,000 | Progressive descendant support |
+| SUPPORT-ARMENIA-800 | ARMENIA | 770.01–849.95 | 3,500 / 8,000 / 15,000 | Progressive descendant support |
+| SUPPORT-BYZANTIUM-1100 | BYZANTIUM | 1050.01–1099.95 | 41,000 / 65,000 / 99,000 | Progressive descendant support |
+| SUPPORT-BYZANTIUM-1300 | BYZANTIUM | 1199.95–1299.95 | 6,500 / 15,000 / 26,500 | Progressive descendant support |
+| SUPPORT-BYZANTIUM-1450 | BYZANTIUM | 1350–1450 | 1,500 / 3,500 / 10,500 | Progressive descendant support |
+| SUPPORT-BALKAN-CORE-1450 | BALKAN-CORE | 1350–1450 | 8,000 / 16,000 / 32,000 | Progressive descendant support |
+| SUPPORT-BALKAN-CORE-2000 | BALKAN-CORE | 1900–2000 | 84,500 / 152,500 / 247,500 | Progressive descendant support |
+| SUPPORT-DANUBIAN-CORE-1700 | DANUBIAN-CORE | 1600–1700 | 22,500 / 39,500 / 58,500 | Progressive descendant support |
+| SUPPORT-DANUBIAN-CORE-1850 | DANUBIAN-CORE | 1750–1850 | 149,500 / 199,500 / 249,500 | Progressive descendant support |
+| SUPPORT-DANUBIAN-CORE-2000 | DANUBIAN-CORE | 1900–2000 | 44,000 / 138,000 / 295,000 | Progressive descendant support |
+| SUPPORT-CENTRAL-CORE-1300 | CENTRAL-CORE | 1360.01–1389.95 | 2,000 / 2,500 / 4,500 | Progressive descendant support |
+| SUPPORT-CENTRAL-CORE-1700 | CENTRAL-CORE | 1600–1700 | 30,500 / 42,500 / 54,500 | Progressive descendant support |
+| SUPPORT-CENTRAL-CORE-1938 | CENTRAL-CORE | 1838–1938 | 0 / 6,500 / 14,000 | Progressive descendant support |
+| SUPPORT-CENTRAL-CORE-1945 | CENTRAL-CORE | 1938–1944.95 | 23,500 / 45,000 / 70,000 | Progressive descendant support |
+| SUPPORT-CENTRAL-CORE-1988 | CENTRAL-CORE | 1944.95–1988 | 18,000 / 30,000 / 45,000 | Progressive descendant support |
+| SUPPORT-CENTRAL-CORE-2000 | CENTRAL-CORE | 1988–2000 | 37,000 / 67,500 / 112,500 | Progressive descendant support |
+| SUPPORT-SINTI-CORE-1300 | SINTI-CORE | 1412.51–1416.95 | 2,000 / 2,000 / 2,000 | Progressive descendant support |
+| SUPPORT-SINTI-CORE-1450 | SINTI-CORE | 1416.95–1461.021429 | 4,500 / 10,500 / 20,000 | Progressive descendant support |
+| SUPPORT-SINTI-CORE-1938 | SINTI-CORE | 1838–1938 | 71,500 / 117,500 / 169,500 | Progressive descendant support |
+| SUPPORT-IBERIAN-CORE-1700 | IBERIAN-CORE | 1600–1700 | 7,500 / 8,000 / 10,000 | Progressive descendant support |
+| SUPPORT-NE-CORE-1938 | NE-CORE | 1838–1938 | 78,000 / 127,000 / 179,500 | Progressive descendant support |
+| SUPPORT-SOUTH-VLAX-1938 | SOUTH-VLAX | 1838–1938 | 8,500 / 13,500 / 20,500 | Progressive descendant support |
+| SUPPORT-SOUTH-VLAX-1960 | SOUTH-VLAX | 1938–1960 | 40,000 / 80,000 / 130,000 | Progressive descendant support |
+| SUPPORT-SOUTH-VLAX-1988 | SOUTH-VLAX | 1960–1988 | 29,500 / 49,500 / 74,500 | Progressive descendant support |
+| MODERN-SUPPORT-IRAQ-BASRA | IRAQ-BASRA | 1900–2024 | 11,250 / 22,500 / 45,000 | Progressive descendant support |
+| MODERN-SUPPORT-IRAQ-THIQAR | IRAQ-THIQAR | 1900–2024 | 9,000 / 18,000 / 36,000 | Progressive descendant support |
+| MODERN-SUPPORT-IRAQ-DIWANIYA | IRAQ-DIWANIYA | 1900–2024 | 6,750 / 13,500 / 27,000 | Progressive descendant support |
+| MODERN-SUPPORT-IRAQ-MAYSAN | IRAQ-MAYSAN | 1900–2024 | 6,750 / 13,500 / 27,000 | Progressive descendant support |
+| MODERN-SUPPORT-IRAQ-BAGHDAD | IRAQ-BAGHDAD | 1900–2024 | 6,750 / 13,500 / 27,000 | Progressive descendant support |
+| MODERN-SUPPORT-IRAQ-NORTH | IRAQ-NORTH | 1900–2024 | 4,500 / 9,000 / 18,000 | Progressive descendant support |
+| MODERN-SUPPORT-ROMANLAR-MARMARA | ROMANLAR-MARMARA | 1900–2013 | 198,000 / 395,000 / 790,000 | Progressive descendant support |
+| MODERN-SUPPORT-ROMANLAR-AEGEAN | ROMANLAR-AEGEAN | 1900–2013 | 173,000 / 346,000 / 692,000 | Progressive descendant support |
+| MODERN-SUPPORT-ROMANLAR-MEDITERRANEAN | ROMANLAR-MEDITERRANEAN | 1900–2013 | 74,000 / 148,000 / 296,000 | Progressive descendant support |
+| MODERN-SUPPORT-ROMANLAR-ANKARA | ROMANLAR-ANKARA | 1900–2013 | 24,500 / 49,000 / 98,000 | Progressive descendant support |
+| MODERN-SUPPORT-ROMANLAR-BLACKSEA | ROMANLAR-BLACKSEA | 1900–2013 | 24,500 / 49,000 / 98,000 | Progressive descendant support |
 
 ## Appendix B. Documentation checks
 
-The document was checked against the frozen model without regenerating the atlas. All 41 support triples match the ledger; all 38 original URLs, 23 additional named-reference rows and 28 wave-reference mappings are present. The supplied-source and prepared-model checksums remained unchanged. Independent reviews checked the citation limits and the distinction between source claims and applied model values.
-
-The Markdown has 110 links: 99 distinct external targets and eight distinct repository-relative targets. No local target was missing. The automated external header check observed 73 HTTP 200 responses, one 202, three 203, nineteen 403 access blocks and three transport failures; no 404 was observed. These results are access diagnostics, not proof of full-text availability or source validity. The separate bibliographic audit used accessible institutional/publisher records and explicitly qualified unreadable items. Public repository links must also be checked after sanitization and publication.
+The document is derived from the frozen generated model without regenerating it. The 35 support triples/intervals, three opening-root triples, journey/pool counts and snapshot hashes match the input files. All 38 original URLs, 23 additional named-reference rows and 28 wave-reference mappings remain present. Sections 10–17 were preserved byte-for-byte during this model-description update; their SHA-256 is `c3c9d783b73863c9e041febdb17f693dba533c29d73b8b1ae047ef76583cce11`. The supplied text remains `ad528f20b62f64de963ee4107a6e6b209f4a3daacda49d397bb53974f5283ebf`. Software, browser/video and historical verification remain separate claims.
