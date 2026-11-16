@@ -1,5 +1,7 @@
 # Roma migrations, 200–2025 CE: sources and methodology
 
+> **Correction pending — 16 November 2026.** The current published Roma snapshot has two reported model errors: some growth dots appear far from established settlements around 1840, and Eastern European resident populations are depleted too far by 2025. Spatial lineage and resident-population accounting are being corrected. This document describes the previous published snapshot; the replacement model, video and documentation are pending verification.
+
 This is an animated reconstruction of movements and selected resident populations associated with the European Romani diaspora, with separately identified Dom, Lom and Iraqi comparative communities. Research preparation, modelling and implementation were AI-assisted.
 
 **The historical evidence, population scenarios and animation geography are different layers.** A dot represents people in the selected reconstruction. It is not a verified medieval headcount, a point census, a biological definition of ethnicity or proof of an exact itinerary. The modern part models selected mobility and regional populations; it does not enumerate every Roma person alive today.
