@@ -1,5 +1,7 @@
 # Roma migrations, 200–2025 CE: sources and methodology
 
+> **Continuity correction pending — 16 November 2026.** The current published Roma snapshot has a reported animation/model timing issue: Syria and Iraq can appear populated before the arriving groups reach them. The origin-to-Iran-to-Anatolia and southward-branch continuity is being corrected. This document describes the previous published snapshot; the replacement model and documentation are pending verification.
+
 This is an animated reconstruction of movements and selected resident populations associated with the European Romani diaspora, with separately identified Dom, Lom and Iraqi comparative communities. Research preparation, modelling and implementation were AI-assisted.
 
 **The historical evidence, the population scenarios and the animation's geography are different layers.** A dot represents people in the selected reconstruction. It is not a verified medieval headcount, a point census, a biological definition of ethnicity or proof of an exact itinerary. The modern part models selected mobility and regional populations; it does not enumerate every Roma person alive today.
