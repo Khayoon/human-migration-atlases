@@ -59,6 +59,9 @@ export interface LedgerReservoir {
   start?:number;
   /** Optional cohort identity and destination colour for shared named pools. */
   group?:string;
+  /** Opt-in display identity for a regional resident aggregate, not a historical movement. */
+  residentGroup?:string;
+  residentRecordId?:string;
   color?:string;
   /** Fixed cohort: transfers are funded normally, without inferred natural growth. */
   closedCohort?:boolean;
@@ -205,12 +208,16 @@ export function applyPopulationLedger(dataset:Dataset,bindings:Map<string,AtlasP
   const scales=prep.scenarioReservoirScales??{low:.2,high:4};
   const fixedRate=prep.fixedAnnualRate;
   const losses=prep.losses??[],additions=prep.additions??[],adjustmentIds=new Set<string>();
-  for(const addition of additions)if(addition.descendantSupport!==undefined&&addition.descendantSupport!==true)
-    throw new Error(`${addition.id}: descendantSupport must be true when provided.`);
+  for(const addition of additions){
+    if(addition.descendantSupport!==undefined&&addition.descendantSupport!==true)throw new Error(`${addition.id}: descendantSupport must be true when provided.`);
+    if(addition.scenarioSpecificAmounts!==undefined&&addition.scenarioSpecificAmounts!==true)throw new Error(`${addition.id}: scenarioSpecificAmounts must be true when provided.`);
+    if(addition.scenarioSpecificAmounts&&!addition.descendantSupport)throw new Error(`${addition.id}: scenario-specific amounts require descendant support.`);
+  }
   for(const adjustment of [...losses,...additions]){
     if(!adjustment.id||adjustmentIds.has(adjustment.id))throw new Error('Population adjustments require unique nonempty IDs.');
     adjustmentIds.add(adjustment.id);
-    if(![adjustment.start,adjustment.end,adjustment.low,adjustment.central,adjustment.high].every(Number.isFinite)||adjustment.start>adjustment.end||adjustment.low<0||adjustment.central<0||adjustment.high<=0||adjustment.low>adjustment.central||adjustment.high<adjustment.central)
+    const specific=additions.includes(adjustment)&&(adjustment as PopulationAddition).scenarioSpecificAmounts===true;
+    if(![adjustment.start,adjustment.end,adjustment.low,adjustment.central,adjustment.high].every(Number.isFinite)||adjustment.start>adjustment.end||adjustment.low<0||adjustment.central<0||adjustment.high<0||Math.max(adjustment.low,adjustment.central,adjustment.high)<=0||!specific&&(adjustment.low>adjustment.central||adjustment.high<adjustment.central))
       throw new Error(`${adjustment.id}: invalid dated population adjustment.`);
     if(adjustment.start<dataset.meta.timeRange[0]||adjustment.end>dataset.meta.timeRange[1]||!adjustment.basis?.trim())throw new Error(`${adjustment.id}: population adjustment needs an in-scope interval and basis.`);
   }
@@ -231,10 +238,13 @@ export function applyPopulationLedger(dataset:Dataset,bindings:Map<string,AtlasP
     if(r.closedCohort!==undefined&&typeof r.closedCohort!=='boolean')throw new Error(`${r.id}: closedCohort must be boolean`);
     if(r.low!==undefined&&(!Number.isFinite(r.low)||r.low<0||r.low>r.initial))throw new Error(`${r.id}: invalid low reservoir prior`);
     if(r.high!==undefined&&(!Number.isFinite(r.high)||r.high<r.initial))throw new Error(`${r.id}: invalid high reservoir prior`);
-    const group=r.group??(r.id==='RES-NW'?(oldHome?.group??'EARLY-HOMELAND'):r.id);
+    if(r.residentGroup!==undefined&&(typeof r.residentGroup!=='string'||!r.residentGroup.trim()))throw new Error(`${r.id}: residentGroup must be a nonempty string`);
+    if(r.residentRecordId!==undefined&&(!r.residentGroup||typeof r.residentRecordId!=='string'||!r.residentRecordId.trim()))throw new Error(`${r.id}: residentRecordId requires an explicit residentGroup and nonempty record ID`);
+    const group=r.residentGroup??r.group??(r.id==='RES-NW'?(oldHome?.group??'EARLY-HOMELAND'):r.id);
     const color=r.color??neutral;
     if(!dataset.groups.some(g=>g.id===group))dataset.groups.push({id:group,name:r.name,color,sources:[],tags:['standing-reservoir']});
     const stock=makeStock(r.id,r.name,r.coord,r.points,group,r.initial,r.capacity,r.regionId,color,r.id==='RES-NW'?'EARLY-HOMELAND':undefined,r.start??start);
+    if(r.residentGroup){stock.tags.push('resident-display-group');stock.residentRecordId=r.residentRecordId;}
     if(r.closedCohort)stock.ledger!.closedCohort=true;
     if(r.low!==undefined){stock.population[0].min=r.low;stock.ledger!.initialLow=r.low;}
     if(r.high!==undefined){stock.population[0].max=r.high;stock.ledger!.initialHigh=r.high;}
@@ -310,6 +320,13 @@ export function applyPopulationLedger(dataset:Dataset,bindings:Map<string,AtlasP
       estimate:{recordId:r.id,low:r.low??r.initial*scales.low,central:r.initial,high:r.high??r.initial*scales.high,
         method:'Explicit stationary population prior',basis:'Stationary local or ancestral display prior, separate from migration totals. '+prep.basis,
         sourceIds:journey?.source.sourceIds??prep.sources.map(source=>source.id)}});
+  }
+  // Regional resident scenarios have their own display identity/source. Keep
+  // legacy aliases and every historical journey group unchanged without opt-in.
+  for(const r of prep.reservoirs)if(r.residentGroup){
+    const stock=rootStocks.get(r.id)!,binding=bindings.get(r.id);
+    if(binding)bindings.set(r.id,{...binding,groupId:stock.group,
+      ...(r.residentRecordId?{recordId:r.residentRecordId,residentRecordId:r.residentRecordId,recordIds:[...new Set([r.residentRecordId,...binding.recordIds])]}:{})});
   }
   // An onward branch can begin only once its inclusive parent has supplied
   // residents. Synthetic preceding-stage dates do not conjure that stock.

@@ -22,12 +22,15 @@ export function settlementSlotPosition(stock:Settlement,slot:number,year:number,
   if(!points?.length)throw new Error(`${stock.id}: settlement slot has no prepared regional position`);
   const index=Math.max(0,Math.trunc(slot))%points.length,mature=points[index];
   const dispersion=stock.dispersion;
-  const epoch=origin?.kind==='arrival'?origin.year:origin?.kind==='growth'?origin.dispersionFrom:undefined;
+  const localGrowth=origin?.kind==='growth'&&dispersion?.growthMode==='local-lineage'&&origin.growthPath;
+  const epoch=localGrowth?origin.year:origin?.kind==='arrival'?origin.year:origin?.kind==='growth'?origin.dispersionFrom:undefined;
+  const years=localGrowth?dispersion!.growthYears??dispersion!.years:dispersion?.years;
   if(!dispersion||epoch===undefined||!Number.isFinite(year)||!Number.isFinite(epoch)
-    ||!Number.isFinite(dispersion.years)||dispersion.years<=0)return mature;
-  const age=Math.max(0,year-epoch),fraction=Math.min(1,age/dispersion.years);
+    ||!Number.isFinite(years)||years!<=0)return mature;
+  const age=Math.max(0,year-epoch),fraction=Math.min(1,age/years!);
+  const path=localGrowth?origin.growthPath!:dispersion.paths[index];
+  if(localGrowth&&origin.growthPathBlocked)return path[0];
   if(fraction>=1)return mature;
-  const path=dispersion.paths[index];
   // A missing/invalid reconstruction must never invent a straight shortcut
   // over water or unsuitable terrain between distant habitat components.
   if(!path?.length)return mature;

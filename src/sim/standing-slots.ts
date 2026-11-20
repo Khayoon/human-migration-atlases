@@ -1,10 +1,13 @@
-import type {Dataset,Settlement} from '../data/types';
+import type {Dataset,LonLat,Settlement} from '../data/types';
 import {growPopulation,ledgerEvents} from '../data/population-ledger';
+import {settlementSlotPosition} from './settlement-dispersal';
+import {settlementResourcePath} from './settlement-resource-path';
+import {haversineKm} from '../util/geo';
 
-export interface SlotTransfer { fromSlot:number; toSlot:number }
+export interface SlotTransfer { fromSlot:number; toSlot:number; fromOrigin?:StandingSlotOrigin }
 /** Biological occupation/birth year stays separate from an inherited local
  * dispersal epoch; a birth is never reclassified as an immigrant credit. */
-export interface StandingSlotOrigin { readonly year:number; readonly kind:'initial'|'arrival'|'growth'; readonly dispersionFrom?:number }
+export interface StandingSlotOrigin { readonly year:number; readonly kind:'initial'|'arrival'|'growth'; readonly dispersionFrom?:number; readonly growthPath?:LonLat[]; readonly growthPathBlocked?:true; readonly parentSlot?:number }
 interface SlotOperation {year:number; changes:[number,number][]; origins:[number,StandingSlotOrigin|null][]; balance:number; nextSlot:number}
 interface SlotPlan {initial:Map<number,number>; initialOrigins:Map<number,StandingSlotOrigin>; operations:SlotOperation[]; maxSlot:number}
 export interface StandingSlots {stocks:Map<string,SlotPlan>; transfers:Map<string,SlotTransfer>; unit:number}
@@ -40,6 +43,17 @@ function growthDispersionFrom(origins:Map<number,StandingSlotOrigin>):number|und
  }
  return Number.isFinite(earliest)?earliest:undefined;
 }
+/** Freeze the living parent's actual position at this birth, rather than
+ * borrowing its slot number or an old arrival epoch that may later be reused. */
+function localGrowthOrigin(stock:Settlement,slot:number,year:number,origins:Map<number,StandingSlotOrigin>,fallback:StandingSlotOrigin):StandingSlotOrigin {
+ const dispersion=stock.dispersion;if(dispersion?.growthMode!=='local-lineage'||!stock.displayPoints?.length)return fallback;
+ const target=stock.displayPoints[slot%stock.displayPoints.length];
+ const parents=[...origins].map(([id,origin])=>{const point=settlementSlotPosition(stock,id,year,origin);return{id,point,distance:haversineKm(point,target)};}).sort((a,b)=>a.distance-b.distance);
+ for(const parent of parents){const path=settlementResourcePath(dispersion,parent.point,target);if(path)return{year,kind:'growth',growthPath:path,parentSlot:parent.id};}
+ const parent=parents[0];
+ if(!parent)throw new Error(`${stock.id}: local growth requires a living spatial ancestor at ${year}`);
+ return{year,kind:'growth',growthPath:[parent.point],growthPathBlocked:true,parentSlot:parent.id};
+}
 /** Assign lifetime slot numbers before rendering. A debit vacates its named
  * slot; its travelling dot begins there, and fills a named arrival slot. */
 export function buildStandingSlots(dataset:Dataset,unit:number,mode:'mid'|'low'|'high'='mid'):StandingSlots {
@@ -52,14 +66,15 @@ export function buildStandingSlots(dataset:Dataset,unit:number,mode:'mid'|'low'|
    const grown=growPopulation(v,e.year-t,s.ledger.annualRate,s.ledger.capacity),changes=new Map<number,number>(),originChanges=new Map<number,StandingSlotOrigin|null>();
    const dispersionFrom=growthDispersionFrom(origins);
    next=addPeople(slots,Math.max(0,grown-v),unit,next,changes,false,(id,addedBefore)=>{
-    const origin:StandingSlotOrigin={year:growthOriginYear(v,v+addedBefore,t,e.year,s.ledger!.annualRate,s.ledger!.capacity),kind:'growth',...(dispersionFrom!==undefined?{dispersionFrom}:{})};
+    const born=growthOriginYear(v,v+addedBefore,t,e.year,s.ledger!.annualRate,s.ledger!.capacity);
+    const origin=localGrowthOrigin(s,id,born,origins,{year:born,kind:'growth',...(dispersionFrom!==undefined?{dispersionFrom}:{})});
     origins.set(id,origin);originChanges.set(id,origin);
    });
    const key=transferKey(e.migrationId,e.index),link=out.transfers.get(key)??{fromSlot:-1,toSlot:-1};
    if(e.delta<0){
     let needed=-e.delta;
     const order=[...slots].sort((a,b)=>(b[1]>=needed?1:0)-(a[1]>=needed?1:0)||a[0]-b[0]);
-    for(const [id,value] of order){if(needed<=1e-6)break;const take=Math.min(value,needed);if(link.fromSlot<0)link.fromSlot=id;
+    for(const [id,value] of order){if(needed<=1e-6)break;const take=Math.min(value,needed);if(link.fromSlot<0){link.fromSlot=id;if(s.dispersion?.growthMode==='local-lineage')link.fromOrigin=origins.get(id);}
      if(value-take<1e-6){slots.delete(id);origins.delete(id);originChanges.set(id,null);}else slots.set(id,value-take);
      changes.set(id,Math.max(0,value-take));needed-=take;
     }
@@ -67,9 +82,11 @@ export function buildStandingSlots(dataset:Dataset,unit:number,mode:'mid'|'low'|
    }else{
     if(e.descendantSupport&&!origins.size)throw new Error(`${s.id}: descendant support ${e.migrationId} requires a surviving resident lineage at ${e.year}`);
     const inherited=e.descendantSupport?growthDispersionFrom(origins):undefined;
+    const parents=new Map(origins);
     let id=0;while(slots.has(id))id++;link.toSlot=id;
     next=addPeople(slots,e.delta,unit,next,changes,true,slot=>{
-     const origin:StandingSlotOrigin={year:e.year,kind:e.descendantSupport?'growth':e.kind==='addition'?'initial':'arrival',...(inherited!==undefined?{dispersionFrom:inherited}:{})};
+     const fallback:StandingSlotOrigin={year:e.year,kind:e.descendantSupport?'growth':e.kind==='addition'?'initial':'arrival',...(inherited!==undefined?{dispersionFrom:inherited}:{})};
+     const origin=e.descendantSupport?localGrowthOrigin(s,slot,e.year,parents,fallback):fallback;
      origins.set(slot,origin);originChanges.set(slot,origin);
     });
    }
@@ -91,7 +108,7 @@ function stateAt(plan:StandingSlots,s:Settlement,t:number,includeOrigins:boolean
  }
  const grown=growPopulation(balance,Math.max(0,t-year),s.ledger!.annualRate,s.ledger!.capacity);
  const dispersionFrom=includeOrigins?growthDispersionFrom(origins):undefined;
- addPeople(slots,Math.max(0,grown-balance),plan.unit,next,new Map(),false,includeOrigins?(id,addedBefore)=>origins.set(id,{year:growthOriginYear(balance,balance+addedBefore,year,t,s.ledger!.annualRate,s.ledger!.capacity),kind:'growth',...(dispersionFrom!==undefined?{dispersionFrom}:{})}):undefined);
+ addPeople(slots,Math.max(0,grown-balance),plan.unit,next,new Map(),false,includeOrigins?(id,addedBefore)=>{const born=growthOriginYear(balance,balance+addedBefore,year,t,s.ledger!.annualRate,s.ledger!.capacity);origins.set(id,localGrowthOrigin(s,id,born,origins,{year:born,kind:'growth',...(dispersionFrom!==undefined?{dispersionFrom}:{})}));}:undefined);
  return {slots,origins};
 }
 

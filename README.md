@@ -11,7 +11,7 @@ Seven separate animated atlases, with an individual source list and methodology 
 | Turks | [Open atlas](https://khayoon.github.io/human-migration-atlases/atlas/turks/) | [Read documentation](docs/atlases/turks/SOURCES_AND_METHODOLOGY.md) |
 | Germanic peoples | [Open atlas](https://khayoon.github.io/human-migration-atlases/atlas/germanics/) | [Read documentation](docs/atlases/germanics/SOURCES_AND_METHODOLOGY.md) |
 | Indo-Europeans | [Open atlas](https://khayoon.github.io/human-migration-atlases/atlas/indoeuropeans/) | [Read documentation](docs/atlases/indoeuropeans/SOURCES_AND_METHODOLOGY.md) |
-| Roma — correction pending | [Open atlas](https://khayoon.github.io/human-migration-atlases/atlas/roma/) | [Read documentation](docs/atlases/roma/SOURCES_AND_METHODOLOGY.md) |
+| Roma | [Open atlas](https://khayoon.github.io/human-migration-atlases/atlas/roma/) | [Read documentation](docs/atlases/roma/SOURCES_AND_METHODOLOGY.md) |
 | Sea Peoples | [Open atlas](https://khayoon.github.io/human-migration-atlases/atlas/seapeoples/) | [Read documentation](docs/atlases/seapeoples/SOURCES_AND_METHODOLOGY.md) |
 
 ## Reading the animations

@@ -41,13 +41,14 @@ const timeScale = originalSeconds / seconds;
 if(Math.abs(timeScale-1)>1e-8)throw new Error('Export must use the approved phase clock without further acceleration');
 const yearAt=elapsed=>advanceNarrativePlayback(range[0],Math.max(0,Math.min(originalSeconds,elapsed)),range,speed,false,dataset).t;
 const fingerprintFiles = ['public/projects/roma.json', ...['dataset','journeys','populationModel','standingLedger','sourceDocument'].map(key => `public/${manifest[key]}`),
+  'public/data/research/roma-migrations.residents.json','public/data/research/roma-migrations.geography.json','scripts/prepare-roma-atlas.mjs','scripts/roma-landscapes.mjs','scripts/roma-dispersal.mjs',
   'src/main.ts','src/data/types.ts','src/style.css','src/time/clock.ts','src/time/phase-pacing.ts','src/sim/engine.ts','src/render/overlay.ts','src/render/geographic-clip.ts','src/render/legend-visibility.ts','src/render/legend-destination.ts','src/map/population-camera.ts','src/map/regional-camera.ts','src/map/basemap.ts','src/data/loader.ts','src/data/atlas-model.ts','src/data/population-ledger.ts','src/data/camera-regions.ts','src/data/continuation-cues.ts','src/ui/continuation-cues.ts'];
 const fingerprints = Object.fromEntries(await Promise.all(fingerprintFiles.map(async path => [path, createHash('sha256').update(await readFile(path)).digest('hex')])));
 const stamp = new Date().toISOString().replaceAll(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
 const directory = join(process.cwd(), 'outputs');
 const inspection = join(process.cwd(), '.atlas-runtime', `roma-video-${stamp}`);
 await mkdir(directory, { recursive: true }); await mkdir(inspection, { recursive: true });
-const stem = `Roma-Migrations-Continuous-Journeys-200-2025-${stamp}`;
+const stem = `Roma-Migrations-Local-Growth-Eastern-Residents-200-2025-${stamp}`;
 const viewing = join(directory, `${stem}.mp4`);
 const partial = join(directory, `${stem}.partial.mp4`);
 const metadataPath = join(directory, `${stem}.json`);
@@ -68,6 +69,7 @@ try { puppeteer = (await import('puppeteer')).default; }
 catch { puppeteer = (await import(pathToFileURL(join(homedir(), 'node_modules/puppeteer/lib/esm/puppeteer/puppeteer.js')).href)).default; }
 
 const hook = `
+import {standingSlotOriginsAt as exportSlotOrigins} from './sim/standing-slots';
 window.__romaBasemapErrors=[];map.on('error',event=>window.__romaBasemapErrors.push(event.error?.message??String(event.error)));
 window.__romaVideo = {
  ready:()=>!!journeyPackage && !!atlasProjection && styleReady && store.state.dataset.migrations.length===${expectedMigrations},
@@ -83,6 +85,7 @@ window.__romaVideo = {
   return {title:store.state.dataset.meta.title,range:store.state.range,speed:store.state.speed,peoplePerDot:engine.basePpd,dotScale:store.state.dotScale,dotStyle:store.state.dataset.meta.dotStyle,cameraPath:store.state.dataset.meta.cameraPath,migrations:store.state.dataset.migrations.length};
  },
  restart:()=>{clock.stop();expandingPopulationCamera.reset();automaticPreparedOverview=true;preparedCameraKey='';window.__romaVideoCameraKey=null;store.setTime(${range[0]});resetView();},
+ startSpatialRecording:()=>{window.__romaRecordSpatial=true;window.__romaPreviousSpatial=new Map();window.__romaSpatialProof={births:0,blocked:0,missingPaths:0,maxBirthDistancePixels:0,maxResidentStepPixels:0,max1830to1850BirthPixels:0,samples:[]};},
  compose:()=>{
   const canvas=window.__romaVideoCanvas,ctx=canvas.getContext('2d');ctx.clearRect(0,0,1920,1080);
   ctx.drawImage(map.getCanvas(),0,0,1920,1080);ctx.drawImage(overlay.canvas,0,0,1920,1080);
@@ -130,7 +133,21 @@ window.__romaVideo = {
   }}
   const basemap={waterFeatures:map.querySourceFeatures('omt',{sourceLayer:'water'}).length,landcoverFeatures:map.querySourceFeatures('omt',{sourceLayer:'landcover'}).length,errors:window.__romaBasemapErrors};
   if(!basemap.waterFeatures&&!basemap.landcoverFeatures)throw new Error('Physical basemap tiles are missing at '+year+': '+JSON.stringify(basemap.errors));
-  return {year:store.state.t,dots:overlay.lastDotCount,zoom:map.getZoom(),center:map.getCenter().toArray(),bounds:map.getBounds().toArray(),cameraPath:mapEl.dataset.cameraPath,cameraRegion:mapEl.dataset.cameraRegion,geographicClip:overlay.canvas.dataset.geographicClip,cues:continuationCueLayer.state(),legend:model.entries.map(item=>({id:item.id,label:item.label,color:item.color})),earlyTravel,basemap};
+  const residents=[];let spatialFrame;
+  const source=window.__romaLastFrame;
+  for(const item of source?.settlements??[]){let people=0,visible=0;const pixels=overlay.screenBufs.get('settlement:'+item.s.id);for(let index=0;index<item.dots.count;index++){people+=item.dots.alphas[index]*item.peoplePerDot;if(Number.isFinite(pixels?.[index*2])&&Number.isFinite(pixels?.[index*2+1]))visible++;}if(people>0)residents.push({id:item.s.id,group:item.s.group,people,dots:item.dots.count,paintedDots:visible});}
+  if(window.__romaRecordSpatial){
+   const proof=window.__romaSpatialProof,previous=window.__romaPreviousSpatial,next=new Map(),scale=512*2**map.getZoom();spatialFrame={births:0,maxBirthDistancePixels:0,maxResidentStepPixels:0};
+   for(const item of source?.settlements??[]){if(!item.s.ledger)continue;const origins=exportSlotOrigins(engine.stableSlots,item.s,year),pixels=overlay.screenBufs.get('settlement:'+item.s.id);
+    for(let index=0;index<item.dots.count;index++){if(item.dots.alphas[index]<=0)continue;const slot=item.dots.slots[index],origin=origins.get(slot),identity=item.s.id+':'+slot,old=previous.get(identity),x=pixels?.[index*2],y=pixels?.[index*2+1],painted=Number.isFinite(x)&&Number.isFinite(y)&&x>=0&&x<=1920&&y>=0&&y<=1080,occupation=origin?.year??item.s.start,mx=item.dots.xs[index],my=item.dots.ys[index];next.set(identity,{occupation,mx,my,painted});
+     if(origin?.kind==='growth'&&(!old||old.occupation!==occupation)){
+      proof.births++;spatialFrame.births++;if(origin.growthPathBlocked)proof.blocked++;if(!origin.growthPath?.length)proof.missingPaths++;
+      if(painted&&origin.growthPath?.length){const start=map.project(origin.growthPath[0]),gap=Math.hypot(x-start.x,y-start.y);proof.maxBirthDistancePixels=Math.max(proof.maxBirthDistancePixels,gap);spatialFrame.maxBirthDistancePixels=Math.max(spatialFrame.maxBirthDistancePixels,gap);if(year>=1830&&year<=1850)proof.max1830to1850BirthPixels=Math.max(proof.max1830to1850BirthPixels,gap);if((year>=1830&&year<=1850&&proof.samples.length<160)||gap>8)proof.samples.push({year,stock:item.s.id,slot,parentSlot:origin.parentSlot,birthYear:occupation,gapPixels:gap});}
+     }else if(old&&old.occupation===occupation&&painted&&old.painted){const dx=mx-old.mx,step=Math.hypot((dx-Math.round(dx))*scale,(my-old.my)*scale);proof.maxResidentStepPixels=Math.max(proof.maxResidentStepPixels,step);spatialFrame.maxResidentStepPixels=Math.max(spatialFrame.maxResidentStepPixels,step);}
+    }
+   }window.__romaPreviousSpatial=next;
+  }
+  return {year:store.state.t,dots:overlay.lastDotCount,zoom:map.getZoom(),center:map.getCenter().toArray(),bounds:map.getBounds().toArray(),cameraPath:mapEl.dataset.cameraPath,cameraRegion:mapEl.dataset.cameraRegion,geographicClip:overlay.canvas.dataset.geographicClip,cues:continuationCueLayer.state(),legend:model.entries.map(item=>({id:item.id,label:item.label,color:item.color})),earlyTravel,basemap,residents,spatialFrame};
  }
 };`;
 const server = await createServer({ configFile: false, root: process.cwd(),
@@ -205,7 +222,7 @@ try {
   if(raw.meta.dotStyle&&(meta.dotStyle?.outlineColor!=='#000000'||meta.dotStyle?.minimumRadius<3.6))throw new Error('Roma enlarged black outlined dots are not active');
   console.log(JSON.stringify({ phase: 'prepared', ...meta, phases, originalSeconds, viewingSeconds: seconds, timeScale, fps, viewing }));
   // Inspect geographical and historical milestones before committing a full render.
-  for (const year of [200,260,330,420,500,600,675,800,950,1100,1538,1943.95,2025]) {
+  for (const year of [200,260,330,420,500,600,675,800,950,1100,1538,1800,1830,1838,1840,1845,1850,1900,1938,1943.95,1946,1960,1989,2000,2025]) {
     const status = await page.evaluate((year) => window.__romaVideo.frame(year, 0), year);
     checks.push(status); await page.screenshot({ path: join(inspection, `preview-${String(year).replace('.', '-')}.png`) });
     const composed=await page.evaluate(()=>window.__romaVideo.compose().toDataURL('image/png').split(',')[1]);
@@ -227,6 +244,7 @@ try {
     if (errors.length) throw new Error(errors.join('\n'));
     console.log(JSON.stringify({ phase: 'check-complete', inspection }));
   } else {
+    await page.evaluate(()=>window.__romaVideo.startSpatialRecording());
     encoder = spawn(ffmpeg, ['-n','-hide_banner','-loglevel','warning','-f','h264','-r',String(fps),'-i','pipe:0','-an','-c:v','copy','-movflags','+faststart',partial], { windowsHide:true, stdio:['pipe','ignore','pipe'] });
     let diagnostics = ''; encoder.stderr.on('data', data => diagnostics += data); encoder.stdin.on('error',()=>{});
     const completion = once(encoder,'close');
@@ -240,7 +258,7 @@ try {
     for (let offset=0;offset<total;offset+=24) {
       const frames=Array.from({length:Math.min(24,total-offset)},(_,index)=>{const frame=offset+index,elapsed=Math.min(renderSeconds,frame/fps);return {frame,elapsed,year:frame===total-1?range[1]:yearAt(Math.min(seconds,elapsed))};});
       const batch=await page.evaluate(async ({frames,fps})=>{
-        let status;const motion=[];for(const item of frames){status=await window.__romaVideo.frame(item.year,item.elapsed);motion.push({...item,zoom:status.zoom,center:status.center,dots:status.dots,earlyTravel:status.earlyTravel});const canvas=window.__romaVideo.compose();const frame=new VideoFrame(canvas,{timestamp:Math.round(item.frame*1000000/fps),duration:Math.round(1000000/fps)});window.__romaEncoder.encode(frame,{keyFrame:item.frame%(fps*5)===0});frame.close();if(window.__romaEncoder.encodeQueueSize>6)await window.__romaEncoder.flush();}
+        let status;const motion=[];for(const item of frames){status=await window.__romaVideo.frame(item.year,item.elapsed);motion.push({...item,zoom:status.zoom,center:status.center,dots:status.dots,earlyTravel:status.earlyTravel,residents:status.residents,spatialFrame:status.spatialFrame});const canvas=window.__romaVideo.compose();const frame=new VideoFrame(canvas,{timestamp:Math.round(item.frame*1000000/fps),duration:Math.round(1000000/fps)});window.__romaEncoder.encode(frame,{keyFrame:item.frame%(fps*5)===0});frame.close();if(window.__romaEncoder.encodeQueueSize>6)await window.__romaEncoder.flush();}
         await window.__romaEncoder.flush();if(window.__romaEncoderError)throw new Error(window.__romaEncoderError);
         const size=window.__romaChunks.reduce((sum,chunk)=>sum+chunk.length,0),bytes=new Uint8Array(size);let cursor=0;for(const chunk of window.__romaChunks){bytes.set(chunk,cursor);cursor+=chunk.length;}window.__romaChunks=[];
         let binary='';for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));return {data:btoa(binary),status,motion};
@@ -277,6 +295,11 @@ try {
     for (const [label,time] of [['opening',0],['opening-2s',2],['opening-5s',5],['opening-10s',10],['opening-15s',15],['opening-20s',20],['opening-25s',25],['opening-30s',30],['middle',seconds/2],['ending',renderSeconds-.1]])
       await command([ffmpeg,'-n','-hide_banner','-loglevel','error','-ss',String(time),'-i',viewing,'-frames:v','1',join(inspection,`${label}.png`)]);
     const cameraMotion=cameraMotionSummary(cameraTrace);
+    const spatialProof=await page.evaluate(()=>window.__romaSpatialProof);
+    const finalResidents=cameraTrace.at(-1).residents,easternIds=['BALKAN-CORE','DANUBIAN-CORE','CENTRAL-CORE','SOUTH-VLAX','NE-CORE','GREECE'];
+    if(easternIds.some(id=>!(finalResidents.find(item=>item.id===id)?.people>0)))throw new Error('An Eastern/Southeastern resident community was depleted from the final frame');
+    if(spatialProof.blocked||spatialProof.missingPaths||spatialProof.maxBirthDistancePixels>8||spatialProof.maxResidentStepPixels>25)throw new Error('Encoded-frame resident spatial continuity failed: '+JSON.stringify(spatialProof));
+    await writeFile(join(inspection,'resident-spatial-proof.json'),JSON.stringify({spatialProof,finalResidents},null,2));
     await writeFile(join(inspection,'camera-motion.json'),JSON.stringify({fps,summary:cameraMotion,frames:cameraTrace},null,2));
     const routeFrames=new Map();
     for(const frame of cameraTrace)for(const route of frame.earlyTravel??[]){
@@ -306,7 +329,7 @@ try {
       if(createHash('sha256').update(await readFile(path)).digest('hex')!==loadedHash)loadedSourceChangedDuringExport.push(path);
     }
     await writeFile(metadataPath,JSON.stringify({schemaVersion:1,edition:'roma',title:meta.title,manifest,range,speed,phases,phaseRates:phases.map(p=>({from:p.from,to:p.to,rate:phaseRateAt(p.from,phases)})),peoplePerDot:1000,dotScale:expectedDotScale,dotStyle:meta.dotStyle,cameraPath:raw.meta.cameraPath,cameraRegions:raw.meta.cameraRegions,continuationCues:raw.meta.continuationCues,estimate:'central',resolution:[width,height],fps,frames:total,originalSeconds,timelineSeconds:seconds,endHoldSeconds,durationSeconds:total/fps,timeScale,
-      temporalSampling:'The complete video follows the corrected app clock at the configured frame rate; app and video use identical default pacing. Early journey motion is recorded at every actual encoded frame.',travelDurations,earlyRouteMotion,
+      temporalSampling:'The complete video follows the corrected app clock at the configured frame rate; app and video use identical default pacing. Early journey motion, local growth and resident populations are recorded at every actual encoded frame.',travelDurations,earlyRouteMotion,spatialProof,finalResidents,
       sourceFingerprints:fingerprints,loadedSourceFingerprints,loadedSourceDirectory:join(inspection,'loaded-source'),changedDuringExport,loadedSourceChangedDuringExport,cameraMotion,inspection,checks,videos,playbackChecks,errors},null,2)+'\n');
     if(changedDuringExport.length||loadedSourceChangedDuringExport.length)throw new Error('Prepared Roma inputs changed during capture: '+JSON.stringify({changedDuringExport,loadedSourceChangedDuringExport,metadataPath}));
     console.log(JSON.stringify({phase:'complete',viewing,metadataPath,inspection,changedDuringExport,loadedSourceChangedDuringExport,cameraMotion}));
